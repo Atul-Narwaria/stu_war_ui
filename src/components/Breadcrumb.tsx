@@ -3,7 +3,7 @@ import { FaAngleLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Breadcrumb(props: {
-  children: any;
+  children?: any;
   name: string;
   backButton?: boolean;
 }) {
@@ -32,7 +32,7 @@ export default function Breadcrumb(props: {
           {props.name}
         </p>
       )}
-      <div className=" flex justify-end gap-2   ">{props.children}</div>
+      <div className=" flex justify-end gap-2   ">{props?.children}</div>
     </div>
   );
 }

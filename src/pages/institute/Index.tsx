@@ -11,7 +11,7 @@ export default function Index() {
   return (
     <>
       <section className={` w-screen min-h-screen z-0 bg-gray-300 relative `}>
-        <SideNav open={open} setOpen={setOpen} type="admin" />
+        <SideNav open={open} setOpen={setOpen} type="institute" />
         <TopNav open={open} setOpen={setOpen} />
         <section
           className={`  absolute top-[10vh] p-3 z-[-1] min-h-[90vh] ${

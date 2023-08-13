@@ -21,6 +21,16 @@ export const createCity = async (city: string, stateId: string, countryid: strin
         return { code: 500, message: e.message }
     }
 }
+
+export const getCityByStateCountry = async (countryid: string, stateId: string) => {
+    try {
+        const create = await instance.get(`/location/city/get/active/${countryid}/${stateId}`)
+        return create.data
+    } catch (e: any) {
+        return { code: 500, message: e.message }
+    }
+}
+
 export const updateCityStatus = async (cityId: string, status: boolean) => {
 
     try {

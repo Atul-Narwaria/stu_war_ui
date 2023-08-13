@@ -1,20 +1,49 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import Cookies from 'js-cookie'
 
-const AuthState = {
-    admin: Cookies.get("admin") || null,
 
+interface AuthState {
+    isLoggedIn: boolean;
+    role: any;
+    isInstituteLogin: boolean;
 }
 
-const authSlice = createSlice({
-    name: "authentication",
-    initialState: AuthState,
-    reducers: {
-        adminlogin(state: any) {
-            state.admin = "admin"
-        }
-    }
-})
+const initialState: AuthState = {
+    isLoggedIn: (Cookies.get("token") && Cookies.get("role") == 'admin') ? true : false,
+    role: Cookies.get("role") ? Cookies.get("role") : "null",
+    isInstituteLogin: (Cookies.get("token") && Cookies.get("role") == 'institute') ? true : false,
 
-export const authAction = authSlice.actions;
+};
+
+const authSlice: any = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        login: (state) => {
+            if (state.role == "admin") {
+                state.isLoggedIn = true;
+            } else {
+                state.isLoggedIn = false
+            }
+
+        },
+        logout: (state) => {
+            state.isInstituteLogin = false;
+            state.isLoggedIn = false;
+        },
+        instituteLogin: (state) => {
+            if (state.role == "institute") {
+                state.isInstituteLogin = true
+            } else {
+                state.isInstituteLogin = false
+            }
+        },
+
+        role: (state) => {
+            state.role = Cookies.get("role") ? Cookies.get("role") : "null"
+        }
+    },
+});
+
+export const { login, logout, instituteLogin } = authSlice.actions;
 export default authSlice.reducer;

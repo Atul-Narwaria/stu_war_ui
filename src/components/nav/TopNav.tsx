@@ -4,6 +4,9 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { FaExpand } from "react-icons/fa";
 import { FiMinimize } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { logout } from "../../store/auth";
+import Cookies from "js-cookie";
 
 export default function TopNav(props: { open: boolean; setOpen: any }) {
   const [fullScreen, setFullScreen] = useState(false);
@@ -12,7 +15,7 @@ export default function TopNav(props: { open: boolean; setOpen: any }) {
   function classNames(...classes: any) {
     return classes.filter(Boolean).join(" ");
   }
-
+  const dispatch = useDispatch();
   useEffect(() => {
     const handleFullscreenChange = () => {
       setFullScreen(!!document.fullscreenElement);
@@ -160,15 +163,24 @@ export default function TopNav(props: { open: boolean; setOpen: any }) {
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      href="/"
+                    <button
+                      onClick={() => {
+                        Cookies.remove("token");
+                        dispatch(logout());
+                      }}
                       className={classNames(
-                        active ? "bg-gray-100" : "",
-                        "block px-4 py-2 text-sm text-gray-700"
+                        active ? "bg-gray-100 w-full" : "",
+                        "block px-4 py-2 text-sm text-gray-700 w-full justify-start text-left"
                       )}
                     >
-                      Sign out
-                    </a>
+                      Logout
+                    </button>
+                    // <a
+                    //   href="/"
+
+                    // >
+                    //   Sign out
+                    // </a>
                   )}
                 </Menu.Item>
               </Menu.Items>

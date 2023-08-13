@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
+import { FaUsers } from "react-icons/fa";
 import { MdOutlineDashboard } from "react-icons/md";
 import { RiSettings4Line } from "react-icons/ri";
 import { NavLink } from "react-router-dom";
 
-export const SideNav = (props: { open: boolean; setOpen: any }) => {
+export const SideNav = (props: {
+  open: boolean;
+  setOpen: any;
+  type: string;
+}) => {
   const [ismobile, setIsMobile] = useState(false);
   const sideOpen: any = useRef();
   useEffect(() => {
@@ -32,22 +37,55 @@ export const SideNav = (props: { open: boolean; setOpen: any }) => {
     };
   }, [props.setOpen]);
 
-  const menus = [
-    { name: "Home", link: "/admin", icon: MdOutlineDashboard },
-    { name: "Institute", link: "/admin/institute", icon: MdOutlineDashboard },
-    {
-      name: "Location",
-      link: "/admin/location",
-      icon: MdOutlineDashboard,
-      margin: true,
-    },
-    {
-      name: "Logout",
-      link: "/admin/settting",
-      icon: RiSettings4Line,
-      margin: true,
-    },
-  ];
+  let menus: any = [];
+
+  if (props.type === "admin") {
+    menus = [
+      { name: "Home", link: "/admin", icon: MdOutlineDashboard, isEnd: true },
+      {
+        name: "Institute",
+        link: "/admin/institute",
+        icon: MdOutlineDashboard,
+        isEnd: true,
+      },
+      {
+        name: "Location",
+        link: "/admin/location",
+        icon: MdOutlineDashboard,
+        margin: true,
+        isEnd: true,
+      },
+      {
+        name: "Logout",
+        link: "/admin/settting",
+        icon: RiSettings4Line,
+        margin: true,
+        isEnd: true,
+      },
+    ];
+  } else if (props.type === "institute") {
+    menus = [
+      {
+        name: "Home",
+        link: "/institute",
+        icon: MdOutlineDashboard,
+        isEnd: true,
+      },
+      {
+        name: "Students",
+        link: "/institute/student",
+        icon: FaUsers,
+        isEnd: false,
+      },
+      {
+        name: "Logout",
+        link: "/",
+        icon: RiSettings4Line,
+        margin: true,
+        isEnd: true,
+      },
+    ];
+  }
 
   return (
     <section className="flex gap-6 absolute z-20">
@@ -74,9 +112,10 @@ export const SideNav = (props: { open: boolean; setOpen: any }) => {
             )}
           </div>
 
-          {menus?.map((menu, i) => (
+          {menus?.map((menu: any, i: any) => (
             <NavLink
               to={menu?.link}
+              end={menu?.isEnd ? true : false}
               key={i}
               onClick={() =>
                 ismobile ? props.setOpen(false) : props.setOpen(true)

@@ -23,8 +23,17 @@ import {
   getAllCountryStateCity,
   updateCityStatus,
 } from "../../service/admin/location/city.service";
+import {
+  deleteInstitute,
+  getAllInstitute,
+  updateInstitueStatus,
+} from "../../service/admin/institute/institue.service";
 
-export default function DataGrids(props: { name: String; refresh?: number }) {
+export default function DataGrids(props: {
+  name: String;
+  refresh?: number;
+  height?: string;
+}) {
   const [loading, setloading] = useState<boolean>(true);
   let columns: any = [];
   let [tableRow, settableRow] = useState([]);
@@ -32,7 +41,7 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
   let fetchActiveCountryData = async () => {
     const get = await getActiveCountry();
     let dt: any = [];
-    get.message?.map((item: any, index: number) => {
+    get?.message?.map((item: any, index: number) => {
       dt.push({
         id: index + 1,
         name: item.CounrtyName,
@@ -144,7 +153,7 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
   let fetchActiveStateData = async () => {
     const get = await getAllStates();
     let dt: any = [];
-    get.message?.map((item: any, index: number) => {
+    get?.message?.map((item: any, index: number) => {
       console.log(item.country.CounrtyName);
       dt.push({
         id: index + 1,
@@ -258,7 +267,7 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
   let fetch_AllCountryStateCity = async () => {
     const get = await getAllCountryStateCity();
     let dt: any = [];
-    get.message?.map((item: any, index: number) => {
+    get?.message?.map((item: any, index: number) => {
       dt.push({
         id: index + 1,
         city: item?.cityName,
@@ -282,16 +291,18 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
   let fetch_AllCity = async () => {
     const get = await getAllCountryStateCity();
     let dt: any = [];
-    get.message?.map((item: any, index: number) => {
-      dt.push({
-        id: index + 1,
-        city: item?.cityName,
-        uuid: item.id,
-        status: item.status,
-        state: item?.state?.stateName,
-        country: item?.state?.country?.CounrtyName,
+    if (get?.message) {
+      get.message?.map((item: any, index: number) => {
+        dt.push({
+          id: index + 1,
+          city: item?.cityName,
+          uuid: item.id,
+          status: item.status,
+          state: item?.state?.stateName,
+          country: item?.state?.country?.CounrtyName,
+        });
       });
-    });
+    }
     console.log(dt);
     setloading(false);
     settableRow(dt);
@@ -395,6 +406,132 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
     ];
   }
 
+  let fetchAllInstitute = async () => {
+    const get = await getAllInstitute();
+    console.log(get);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+          dt.push({
+            id: index + 1,
+            uuid: item.id,
+            status: item.status,
+            name: item.name,
+            code: item.code,
+            email: item.email,
+            phone: item.phone,
+            state: item?.instituteAddress[0]?.state?.stateName,
+            city: item?.instituteAddress[0]?.city?.cityName,
+          });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+  if (props.name === "institutemaster") {
+    columns = [
+      { field: "id", headerName: "ID", width: 10 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "code", headerName: "code", width: 120 },
+      { field: "email", headerName: "email", width: 240 },
+      { field: "phone", headerName: "phone", width: 140 },
+      { field: "state", headerName: "state", width: 100 },
+      { field: "city", headerName: "city", width: 200 },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 200,
+        renderCell: (params: any) => {
+          const handlepUpdateStatus = async () => {
+            setloading(true);
+            const { message, status } = await updateInstitueStatus(
+              params.row.uuid,
+              !params.row.status
+            );
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstitute();
+            }
+            setloading(false);
+          };
+          const handlepDelete = async () => {
+            setloading(true);
+            const { message, status } = await deleteInstitute(params.row.uuid);
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstitute();
+            }
+            setloading(false);
+          };
+          return (
+            <div className="flex gap-4 flex-row">
+              {params.row.status == true ? (
+                <>
+                  {params.row.status}
+                  <FaEye
+                    onClick={handlepUpdateStatus}
+                    className=" text-blue-700 hover:cursor-pointer text-lg"
+                  />
+                </>
+              ) : (
+                <FaEyeSlash
+                  onClick={handlepUpdateStatus}
+                  className=" text-blue-700 hover:cursor-pointer text-lg"
+                />
+              )}
+              <FaTrash
+                onClick={handlepDelete}
+                className=" text-red-700 hover:cursor-pointer text-lg"
+              />
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
   useEffect(() => {
     if (props.name === "AdminActiveCountry" && props.refresh) {
       fetchActiveCountryData();
@@ -408,20 +545,27 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
     if (props.name === "AdminCity" && props.refresh) {
       fetch_AllCity();
     }
+    if (props.name === "institutemaster" && props.refresh) {
+      fetchAllInstitute();
+    }
   }, [props.refresh]);
 
   return (
     <>
-      <Box sx={{ height: 400, width: 1 }}>
-        {loading ? (
-          <Skeleton
-            animation="wave"
-            variant="rounded"
-            sx={{ background: "gray", width: 1 }}
-            height={400}
-          />
-        ) : (
+      {loading ? (
+        <Skeleton
+          animation="wave"
+          variant="rounded"
+          sx={{ background: "gray", width: 1 }}
+          height={props.height ? props.height : 400}
+        />
+      ) : (
+        <Box
+          sx={{ height: props.height ? props.height : 400, width: 1 }}
+          className={` shadow-md rounded-xl p-2 bg-gray-50`}
+        >
           <DataGrid
+            sx={{ border: 0 }}
             rows={tableRow}
             disableColumnFilter
             disableColumnSelector
@@ -435,8 +579,8 @@ export default function DataGrids(props: { name: String; refresh?: number }) {
               },
             }}
           />
-        )}
-      </Box>
+        </Box>
+      )}
     </>
   );
 }

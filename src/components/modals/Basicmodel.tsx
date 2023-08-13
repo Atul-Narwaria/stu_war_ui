@@ -31,17 +31,17 @@ export default function Basicmodel(props: {
   return (
     <>
       {props.isOpen ? (
-        <div className="modal-overlay  z-50 absolute top-[-5vh] left-0 right-0 bottom-0 bg-[#00000067] flex  justify-center items-center">
+        <div className="modal-overlay  z-50 absolute top-[-5vh] left-0 right-0 bottom-0 bg-[#00000067] flex  justify-center items-center max-h-[100vh] overflow-auto">
           <div
             ref={modalRef}
-            className={`modal-content bg-white p-4 rounded-lg shadow-lg relative top-[-18vh] ${
+            className={`   modal-content bg-white p-4 rounded-lg shadow-lg relative top-[-0vh]  ${
               props.width ? props.width : "min-w-[40vw]"
             }`}
           >
             <p className=" font-semibold text-lg">{props.name}</p>
             <button
               onClick={() => props.isClode(!props.isOpen)}
-              className="close-button bg-red-600  absolute top-2 right-2 text-lg cursor-pointer hover:cursor-pointer px-2 rounded-lg text-white hover:shadow-lg"
+              className="close-button bg-red-600   absolute top-2 right-2 text-lg cursor-pointer hover:cursor-pointer px-2 rounded-lg text-white hover:shadow-lg"
             >
               &times;
             </button>
