@@ -8,7 +8,6 @@
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
     "@hookform/error-message": "^2.0.1",
-    "@material-ui/utils": "^4.11.3",
     "@mui/icons-material": "^5.14.1",
     "@mui/material": "^5.14.2",
     "@mui/x-data-grid": "^6.10.2",
