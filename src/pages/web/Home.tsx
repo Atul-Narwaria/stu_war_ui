@@ -34,7 +34,7 @@ export default function Home() {
   const dispatch = useDispatch();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    if (Logintype == "Admin") {
+    if (Logintype === "Admin") {
       const { code, message, status, token, role } = await AdminLogin(
         data.email,
         data.password
@@ -51,11 +51,12 @@ export default function Home() {
             progress: undefined,
             theme: "dark",
           });
+        } else if (status === "success") {
+          Cookies.set(`role`, `${role}`);
+          Cookies.set("token", `${token}`);
+          dispatch(login());
+          navigate("/admin");
         }
-        Cookies.set(`role`, `${role}`);
-        Cookies.set("token", `${token}`);
-        dispatch(login());
-        navigate("/admin", { replace: true });
       } else {
         toast.error("incorrect email/password", {
           position: "top-right",
@@ -68,8 +69,7 @@ export default function Home() {
           theme: "dark",
         });
       }
-    }
-    if (Logintype == "Institute") {
+    } else if (Logintype === "Institute") {
       const { code, message, status, token, role } = await InstituteLogin(
         data.email,
         data.password
@@ -90,7 +90,7 @@ export default function Home() {
         Cookies.set(`role`, `${role}`);
         Cookies.set("token", `${token}`);
         dispatch(instituteLogin());
-        navigate("/institute", { replace: true });
+        navigate("/institute");
       } else {
         toast.error("incorrect email/password", {
           position: "top-right",

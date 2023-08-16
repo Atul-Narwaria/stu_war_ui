@@ -49,16 +49,15 @@ export const SideNav = (props: {
         isEnd: true,
       },
       {
-        name: "Location",
-        link: "/admin/location",
+        name: "Stundents",
+        link: "/admin/students",
         icon: MdOutlineDashboard,
-        margin: true,
         isEnd: true,
       },
       {
-        name: "Logout",
-        link: "/admin/settting",
-        icon: RiSettings4Line,
+        name: "Location",
+        link: "/admin/location",
+        icon: MdOutlineDashboard,
         margin: true,
         isEnd: true,
       },
@@ -76,13 +75,6 @@ export const SideNav = (props: {
         link: "/institute/student",
         icon: FaUsers,
         isEnd: false,
-      },
-      {
-        name: "Logout",
-        link: "/",
-        icon: RiSettings4Line,
-        margin: true,
-        isEnd: true,
       },
     ];
   }

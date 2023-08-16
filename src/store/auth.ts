@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import Cookies from 'js-cookie'
 
 
@@ -9,9 +9,9 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    isLoggedIn: (Cookies.get("token") && Cookies.get("role") == 'admin') ? true : false,
+    isLoggedIn: (Cookies.get("token") && Cookies.get("role") === 'admin') ? true : false,
     role: Cookies.get("role") ? Cookies.get("role") : "null",
-    isInstituteLogin: (Cookies.get("token") && Cookies.get("role") == 'institute') ? true : false,
+    isInstituteLogin: (Cookies.get("token") && Cookies.get("role") === 'institute') ? true : false,
 
 };
 
@@ -20,7 +20,7 @@ const authSlice: any = createSlice({
     initialState,
     reducers: {
         login: (state) => {
-            if (state.role == "admin") {
+            if (Cookies.get("role") === "admin") {
                 state.isLoggedIn = true;
             } else {
                 state.isLoggedIn = false
@@ -32,7 +32,7 @@ const authSlice: any = createSlice({
             state.isLoggedIn = false;
         },
         instituteLogin: (state) => {
-            if (state.role == "institute") {
+            if (Cookies.get("role") === "institute") {
                 state.isInstituteLogin = true
             } else {
                 state.isInstituteLogin = false

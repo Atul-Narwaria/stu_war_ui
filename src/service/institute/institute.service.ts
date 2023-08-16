@@ -12,7 +12,7 @@ export const InstituteLogin = async (email: string, password: string) => {
 
 
     } catch (e: any) {
-        if (e.response.status == 401) {
+        if (e.response.status === 401) {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',

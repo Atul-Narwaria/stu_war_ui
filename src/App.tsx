@@ -17,7 +17,10 @@ const AdminLocationCountry = lazy(
 );
 const AdminLocationState = lazy(() => import("./pages/admin/location/State"));
 const AdminLocationCity = lazy(() => import("./pages/admin/location/City"));
-
+const AdminStudent = lazy(() => import("./pages/admin/student/Student"));
+const AdminStudentCreate = lazy(
+  () => import("./pages/admin/student/StudentCreate")
+);
 const InstIndex = lazy(() => import("./pages/institute/Index"));
 const InstHome = lazy(() => import("./pages/institute/Home"));
 const InstStudent = lazy(() => import("./pages/institute/student/Student"));
@@ -84,6 +87,14 @@ function App() {
             <Route
               path="institute"
               element={isAdmin ? <AdminInstitute /> : <WebHome />}
+            />
+            <Route
+              path="students"
+              element={isAdmin ? <AdminStudent /> : <WebHome />}
+            />
+            <Route
+              path="student/create"
+              element={isAdmin ? <AdminStudentCreate /> : <WebHome />}
             />
             <Route
               path="location"

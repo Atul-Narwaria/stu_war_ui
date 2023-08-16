@@ -1,6 +1,5 @@
 import Swal from "sweetalert2"
 import instance from "../../instance"
-import { Redirect } from "../../../components/Redirect"
 
 export const createInstiture = async (
     name: string,
@@ -40,7 +39,7 @@ export const getAllInstitute = async () => {
         return get.data
     } catch (e: any) {
 
-        if (e.response.status == 401) {
+        if (e.response.status === 401) {
             Swal.fire({
                 icon: 'error',
                 title: 'Session time out',
