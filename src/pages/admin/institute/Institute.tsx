@@ -5,7 +5,6 @@ import Breadcrumb from "../../../components/Breadcrumb";
 import TextField from "@mui/material/TextField";
 import { getActiveCountry } from "../../../service/admin/location/country.service";
 import Autocomplete from "@mui/material/Autocomplete";
-import DataGridSkeleton from "../../../components/skeletons/DataGridSkeleton";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { getActiveStatesByCountry } from "../../../service/admin/location/state.service";
 import { getCityByStateCountry } from "../../../service/admin/location/city.service";

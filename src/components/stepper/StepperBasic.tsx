@@ -57,18 +57,14 @@ export default function StepperBasic(props: {
   props.setActiveStep(activeStep);
   return (
     <>
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%" }} className={` `}>
         <Stepper activeStep={activeStep}>
           {steps.map((label: any, index: number) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;
             } = {};
-            if (isStepOptional(index)) {
-              labelProps.optional = (
-                <Typography variant="caption">Optional</Typography>
-              );
-            }
+
             if (isStepSkipped(index)) {
               stepProps.completed = false;
             }
@@ -92,25 +88,32 @@ export default function StepperBasic(props: {
         ) : (
           <React.Fragment>
             {props.children}
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
-              <Box sx={{ flex: "1 1 auto" }} />
-              {isStepOptional(activeStep) && (
-                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                  Skip
-                </Button>
-              )}
-              <Button onClick={handleNext}>
-                {activeStep === steps.length - 1 ? "Finish" : "Next"}
-              </Button>
-            </Box>
+            <div className={` absolute bottom-5 right-5`}>
+              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                <button
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  className=" bg-gray-600  px-4 py-2 mx-2 rounded-lg hover:shadow-lg duration-300 text-white hover:bg-gray-700 "
+                >
+                  BACK
+                </button>
+                <Box sx={{ flex: "1 1 auto" }} />
+                {isStepOptional(activeStep) && (
+                  <button
+                    className="bg-red-400 px-4 py-2 mx-2 rounded-lg hover:shadow-lg duration-300 text-white hover:bg-red-500 "
+                    onClick={handleSkip}
+                  >
+                    SKIP
+                  </button>
+                )}
+                <button
+                  onClick={handleNext}
+                  className=" bg-green-600  px-4 py-2 mx-2 rounded-lg hover:shadow-lg duration-300 text-white hover:bg-green-700 "
+                >
+                  {activeStep === steps.length - 1 ? "Finish" : "Next"}
+                </button>
+              </Box>
+            </div>
           </React.Fragment>
         )}
       </Box>
