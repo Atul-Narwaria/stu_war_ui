@@ -10,11 +10,11 @@ export default function Index() {
 
   return (
     <>
-      <section className={` w-screen min-h-screen z-0 bg-gray-300 relative `}>
+      <section className={` w-screen min-h-screen  z-0 bg-gray-300 relative `}>
         <SideNav open={open} setOpen={setOpen} type="institute" />
         <TopNav open={open} setOpen={setOpen} />
         <section
-          className={`  absolute top-[10vh] p-3 z-[-1] min-h-[90vh] ${
+          className={`  absolute   top-[10vh] p-3 z-[-1] mb-2 min-h-[90vh]  max-h-[90vh] overflow-auto  ${
             open
               ? "left-[48vw] lg:left-[15vw] md:left-[25vw] lg:w-[85vw] md:w-[73vw] w-[52vw] "
               : "left-0 md:left-[8vw] lg:left-[5vw] w-full md:w-[92vw] lg:w-[95vw] "

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
-import StepperBasic from "../../../components/stepper/StepperBasic";
 import TextField from "@mui/material/TextField";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -12,15 +11,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import { Autocomplete } from "@mui/material";
+import { createInstituteStudent } from "../../../service/institute/student.service";
+import dayjs from "dayjs";
 
 interface StudentCreateForm {
-  name: string;
+  firstname: string;
+  lastname: string;
   email: string;
   phone: number;
   dob: string;
+  gender: string;
   county: string;
   state: string;
   city: string;
@@ -36,7 +38,8 @@ export default function Create() {
   const [citylist, setCityList] = useState([]);
   const [selectCity, setSelectedCity] = useState<any>(null);
   const [selectCountry, setSelectedCounty] = useState<any>("");
-
+  const [gender, setGender] = useState<any>("male");
+  const [dob, setDob] = useState<any>(dayjs());
   const {
     register,
     formState: { errors },
@@ -78,44 +81,46 @@ export default function Create() {
     console.log(get.message);
     setCityList(get.message);
   };
-  const onSubmit: SubmitHandler<StudentCreateForm> = async (data: any) => {
-    console.log(data);
-    // const { message, status } = await createInstiture(
-    //   data.name,
-    //   data.email,
-    //   data.phone,
-    //   data.password,
-    //   data.confirmPassword,
-    //   selectCountry,
-    //   selectedState,
-    //   selectCity,
-    //   data.address,
-    //   data.pin
-    // );
-    // if (status == "error") {
-    //   toast.error(message, {
-    //     position: "top-right",
-    //     autoClose: 5000,
-    //     hideProgressBar: false,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //     theme: "dark",
-    //   });
-    // } else {
-    //   toast.success(message, {
-    //     position: "top-right",
-    //     autoClose: 5000,
-    //     hideProgressBar: false,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //     theme: "dark",
-    //   });
 
-    //   reset();
+  const onSubmit: SubmitHandler<StudentCreateForm> = async (data: any) => {
+    const { message, status } = await createInstituteStudent(
+      data.firstname,
+      data.lastname,
+      data.email,
+      data.phone,
+      dob,
+      gender,
+      selectCountry,
+      selectedState,
+      selectCity,
+      data.address,
+      data.pin
+    );
+    if (status == "error") {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    } else {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+
+      reset();
+    }
   };
 
   return (
@@ -128,17 +133,36 @@ export default function Create() {
               <p className="mb-3 text-gray-500">Basic Info</p>
               <div className="grid grid-cols-1 gap-2 mb-2">
                 <TextField
-                  error={errors.name ? true : false}
-                  helperText={errors.name?.message}
-                  {...register("name", {
-                    required: "name required",
+                  error={errors.firstname ? true : false}
+                  helperText={errors.firstname?.message}
+                  {...register("firstname", {
+                    required: "firstname required",
                     minLength: {
                       value: 3,
                       message: "minimun 3 character required",
                     },
                   })}
                   id="outlined-basic"
-                  label="Full Name *"
+                  label="First Name *"
+                  sx={{
+                    width: 1,
+                  }}
+                  variant="outlined"
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-2 mb-2">
+                <TextField
+                  error={errors.lastname ? true : false}
+                  helperText={errors.lastname?.message}
+                  {...register("lastname", {
+                    required: "lastname required",
+                    minLength: {
+                      value: 3,
+                      message: "minimun 3 character required",
+                    },
+                  })}
+                  id="outlined-basic"
+                  label="Last Name *"
                   sx={{
                     width: 1,
                   }}
@@ -150,6 +174,7 @@ export default function Create() {
                   <TextField
                     error={errors.phone ? true : false}
                     {...register("phone", {
+                      required: "phone required",
                       minLength: {
                         value: 10,
                         message: "minimun 10 character required",
@@ -194,51 +219,92 @@ export default function Create() {
               <div className="grid grid-cols-1 gap-2 mb-2">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    label="Date of Birth"
+                    label="Date of Birth *"
+                    defaultValue={dayjs()}
+                    disableFuture
+                    onChange={(date: any) => {
+                      setDob(
+                        `${date?.year()}-${date?.month()}-${date?.date()}`
+                      );
+                    }}
                     slotProps={{
                       textField: {
                         variant: "outlined",
-                        error: true,
-                        helperText: "error",
+                        error: dob == null ? true : false,
+                        helperText: dob == null ? "dob required" : null,
                       },
                     }}
                   />
                 </LocalizationProvider>
                 <FormLabel id="demo-row-radio-buttons-group-label">
-                  Gender
+                  <p
+                    className={`text-sm ${
+                      gender == null ? "#e74c3c" : "text-gray-500"
+                    } `}
+                  >
+                    Select Gender *
+                  </p>
                 </FormLabel>
                 <RadioGroup
                   row
+                  sx={{
+                    color: gender == null ? "#e74c3c" : "",
+                    marginTop: "-10px",
+                  }}
+                  onChange={(event) => {
+                    setGender(event.target.value);
+                  }}
                   aria-labelledby="demo-row-radio-buttons-group-label"
                   name="row-radio-buttons-group"
                 >
                   <FormControlLabel
                     value="female"
-                    control={<Radio />}
+                    control={
+                      <Radio
+                        sx={{
+                          color: gender == null ? "#e74c3c" : "",
+                        }}
+                      />
+                    }
                     label="Female"
                   />
                   <FormControlLabel
                     value="male"
-                    control={<Radio />}
+                    control={
+                      <Radio
+                        sx={{
+                          color: gender == null ? "#e74c3c" : "",
+                        }}
+                      />
+                    }
                     label="Male"
                   />
                   <FormControlLabel
                     value="other"
-                    control={<Radio />}
+                    control={
+                      <Radio
+                        sx={{
+                          color: gender == null ? "#e74c3c" : "",
+                        }}
+                      />
+                    }
                     label="Other"
                   />
                 </RadioGroup>
+                <small className="pl-2 mt-[-10px] text-red-600">
+                  {gender == null ? "gender required" : null}
+                </small>
               </div>
             </div>
             <div className="p-1 md:p-5  ">
-              <p className="mb-3 text-gray-500">Address</p>
+              <p className="mb-3 text-gray-500">Address </p>
               <div className="grid grid-cols-1 gap-2 mb-2">
                 <Autocomplete
                   disablePortal
                   id="combo-box-demo"
                   options={statelist}
                   getOptionLabel={(option: any) =>
-                    option?.stateName ? option?.stateName : "select state"
+                    option?.stateName ? option?.stateName : "select state *"
                   }
                   sx={{ width: 1, marginBottom: "10px" }}
                   onChange={(event: any, newValue: any | null) => {
@@ -256,7 +322,7 @@ export default function Create() {
                             : false
                         }
                         {...params}
-                        label="select state"
+                        label="select state *"
                         {...register("state", {
                           required: "state  required",
                         })}
@@ -287,7 +353,7 @@ export default function Create() {
                             : false
                         }
                         {...params}
-                        label="select city"
+                        label="select city *"
                         {...register("city", {
                           required: "city  required",
                         })}
@@ -304,7 +370,7 @@ export default function Create() {
                     required: "address required",
                   })}
                   id="outlined-basic"
-                  label="address"
+                  label="address *"
                   sx={{
                     width: 1,
                     marginBottom: 1,
@@ -321,7 +387,8 @@ export default function Create() {
                     maxLength: 6,
                   })}
                   id="outlined-basic"
-                  label="pin"
+                  type="number"
+                  label="pin *"
                   sx={{
                     width: 1,
                   }}
