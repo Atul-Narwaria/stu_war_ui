@@ -13,6 +13,7 @@ import { createInstiture } from "../../../service/admin/institute/institue.servi
 import { toast } from "react-toastify";
 import StepperBasic from "../../../components/stepper/StepperBasic";
 import { useNavigate } from "react-router-dom";
+import PaginationDataGrid from "../../../components/table/PaginationDataGrid";
 
 // interface stundetSubmissionForm {
 //   firstname: string;
@@ -89,7 +90,11 @@ export default function Student() {
       </Breadcrumb>
       <div className="mt-3">
         {/* <DataGridSkeleton /> */}
-        <DataGrids name="institutemaster" height="70vh" refresh={render} />
+        <PaginationDataGrid
+          name="institutemaster"
+          height="70vh"
+          refresh={render}
+        />
       </div>
     </>
   );

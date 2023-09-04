@@ -28,6 +28,7 @@ import {
   getAllInstitute,
   updateInstitueStatus,
 } from "../../service/admin/institute/institue.service";
+import { getInstituteStudents } from "../../service/institute/student.service";
 
 export default function DataGrids(props: {
   name: String;
@@ -37,6 +38,10 @@ export default function DataGrids(props: {
   const [loading, setloading] = useState<boolean>(true);
   let columns: any = [];
   let [tableRow, settableRow] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
   let fetchActiveCountryData = async () => {
     const get = await getActiveCountry();
@@ -531,6 +536,131 @@ export default function DataGrids(props: {
       },
     ];
   }
+  let fetchAllInstituteStudents = async () => {
+    const get = await getInstituteStudents();
+    console.log(get);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+          dt.push({
+            id: index + 1,
+            uuid: item.id,
+            status: item.status,
+            name: item.firstName + " " + item.lastName,
+            admissionid: item.admissionId,
+            email: item.email,
+            phone: item.phone,
+            DOB: item.dob,
+            gender: item.gender,
+          });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+  if (props.name === "instituteStudents") {
+    columns = [
+      { field: "id", headerName: "ID", width: 10 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "email", headerName: "email", width: 120 },
+      { field: "phone", headerName: "phone", width: 240 },
+      { field: "DOB", headerName: "date of birth", width: 140 },
+      { field: "gender", headerName: "gender", width: 100 },
+      { field: "admissionid", headerName: "admission id", width: 200 },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 200,
+        renderCell: (params: any) => {
+          const handlepUpdateStatus = async () => {
+            setloading(true);
+            const { message, status } = await updateInstitueStatus(
+              params.row.uuid,
+              !params.row.status
+            );
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstitute();
+            }
+            setloading(false);
+          };
+          const handlepDelete = async () => {
+            setloading(true);
+            const { message, status } = await deleteInstitute(params.row.uuid);
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstitute();
+            }
+            setloading(false);
+          };
+          return (
+            <div className="flex gap-4 flex-row">
+              {params.row.status == true ? (
+                <>
+                  {params.row.status}
+                  <FaEye
+                    onClick={handlepUpdateStatus}
+                    className=" text-blue-700 hover:cursor-pointer text-lg"
+                  />
+                </>
+              ) : (
+                <FaEyeSlash
+                  onClick={handlepUpdateStatus}
+                  className=" text-blue-700 hover:cursor-pointer text-lg"
+                />
+              )}
+              <FaTrash
+                onClick={handlepDelete}
+                className=" text-red-700 hover:cursor-pointer text-lg"
+              />
+            </div>
+          );
+        },
+      },
+    ];
+  }
 
   useEffect(() => {
     if (props.name === "AdminActiveCountry" && props.refresh) {
@@ -547,6 +677,9 @@ export default function DataGrids(props: {
     }
     if (props.name === "institutemaster" && props.refresh) {
       fetchAllInstitute();
+    }
+    if (props.name === "instituteStudents" && props.refresh) {
+      fetchAllInstituteStudents();
     }
   }, [props.refresh]);
 
