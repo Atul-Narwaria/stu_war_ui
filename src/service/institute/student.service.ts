@@ -36,6 +36,21 @@ export const createInstituteStudent = async (
         return { code: e.response.status, message: e.message, status: "error" }
     }
 }
+
+export const createInstituteBulkStudent = async (data: any) => {
+    try {
+        const get = await instance.post('/institute/student/create/bulk', {
+
+            data
+
+        },
+        )
+        return { code: 200, message: get.data.message, status: get?.data?.status }
+    } catch (e: any) {
+        return { code: e.response.status, message: e.message, status: "error" }
+    }
+}
+
 export const getInstituteStudents = async (page?: number) => {
     try {
         let pg = 1;

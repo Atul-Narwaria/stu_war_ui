@@ -13,8 +13,13 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import { Autocomplete } from "@mui/material";
-import { createInstituteStudent } from "../../../service/institute/student.service";
+import {
+  createInstituteBulkStudent,
+  createInstituteStudent,
+} from "../../../service/institute/student.service";
 import dayjs from "dayjs";
+import Basicmodel from "../../../components/modals/Basicmodel";
+import * as XLSX from "xlsx";
 
 interface StudentCreateForm {
   firstname: string;
@@ -40,13 +45,21 @@ export default function Create() {
   const [selectCountry, setSelectedCounty] = useState<any>("");
   const [gender, setGender] = useState<any>("male");
   const [dob, setDob] = useState<any>(dayjs());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [data, setData] = useState<any>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
   const {
     register,
     formState: { errors },
     reset,
     handleSubmit,
   } = useForm<StudentCreateForm>();
-
+  const sendSetToAPI = async (setDataToUpload: any) => {
+    // Here, you can send 'setDataToUpload' to your API
+    await createInstituteBulkStudent(setDataToUpload);
+  };
   useEffect(() => {
     const api = async () => {
       const get = await getActiveCountry();
@@ -69,7 +82,19 @@ export default function Create() {
     };
 
     api();
-  }, []);
+    if (data.length === 0) return;
+    const totalUnits = data.length;
+    let startIndex = (currentPage - 1) * itemsPerPage;
+    let endIndex = Math.min(startIndex + itemsPerPage, totalUnits);
+
+    while (startIndex < totalUnits) {
+      const setDataToUpload = data.slice(startIndex, endIndex);
+      sendSetToAPI(setDataToUpload);
+
+      startIndex = endIndex;
+      endIndex = Math.min(startIndex + itemsPerPage, totalUnits);
+    }
+  }, [currentPage, data, itemsPerPage]);
   const handleStateByCountry = async (value: string) => {
     const get = await getActiveStatesByCountry(value);
     setSelectedCounty(value);
@@ -122,10 +147,51 @@ export default function Create() {
       reset();
     }
   };
+  const handleFileChange = (e: any) => {
+    setSelectedFile(e.target.files[0]);
+  };
+  const handleSubmit1 = (e: any) => {
+    e.preventDefault();
+
+    if (selectedFile) {
+      const reader = new FileReader();
+
+      reader.onload = (event: any) => {
+        const data = event.target.result;
+
+        // Parse the Excel file data
+        const workbook = XLSX.read(data, { type: "binary" });
+
+        // Get the first sheet
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Convert the sheet data to JSON
+        const excelData = XLSX.utils.sheet_to_json(worksheet);
+
+        // Now, excelData contains your Excel file data as a JSON array
+        setData(excelData);
+      };
+
+      reader.readAsBinaryString(selectedFile);
+    }
+  };
 
   return (
     <>
-      <Breadcrumb name="Create Student"></Breadcrumb>
+      <Breadcrumb name="Create Student">
+        <button className=" text-white bg-green-700 p-2 rounded-lg hover:shadow-lg">
+          <a href="http://studiorinternational.in/atul/bulk_student.xlsx">
+            Download Sample
+          </a>
+        </button>
+        <button
+          onClick={() => setIsModalOpen(!isModalOpen)}
+          className=" text-white bg-primary p-2 rounded-lg hover:shadow-lg"
+        >
+          Create Bulk Student
+        </button>
+      </Breadcrumb>
       <div className=" bg-white mt-3 md:p-4 p-2    rounded-lg shadow-md   ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-2  grid-col-1 ">
@@ -407,6 +473,33 @@ export default function Create() {
           </div>
         </form>
       </div>
+      <Basicmodel
+        isOpen={isModalOpen}
+        isClode={setIsModalOpen}
+        name="Upload Bluk Stundet"
+      >
+        <form onSubmit={handleSubmit1} className=" flex flex-col p-2">
+          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Select excel *
+          </label>
+          <input
+            onChange={handleFileChange}
+            accept=".xlsx"
+            className="block w-full text-lg p-3 text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            id="file_input"
+            type="file"
+            required
+          ></input>
+          <button
+            type="submit"
+            //  onClick={() => handleSubmit(onSubmit)}
+            className=" bg-secondary text-white text-xl w-full p-2 my-2 hover:bg-primary hover:shadow-xl 
+            duration-500 rounded-lg"
+          >
+            Upload
+          </button>
+        </form>
+      </Basicmodel>
     </>
   );
 }
