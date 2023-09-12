@@ -13,6 +13,7 @@ import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { instituteLogin, login } from "../../store/auth";
 import { InstituteLogin } from "../../service/institute/institute.service";
+import { setAuthToken } from "../../service/AuthConfig";
 
 interface IFormInput {
   email: string;
@@ -23,6 +24,7 @@ export default function Home() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [Logintype, setLogintype] = useState("student");
+  const [isLoading, setIsloading] = useState<boolean>(false);
   const {
     register,
     formState: { errors },
@@ -34,6 +36,7 @@ export default function Home() {
   const dispatch = useDispatch();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    setIsloading(true)
     if (Logintype === "Admin") {
       const { code, message, status, token, role } = await AdminLogin(
         data.email,
@@ -54,6 +57,7 @@ export default function Home() {
         } else if (status === "success") {
           Cookies.set(`role`, `${role}`);
           Cookies.set("token", `${token}`);
+          setAuthToken(token);
           dispatch(login());
           navigate("/admin");
         }
@@ -89,6 +93,7 @@ export default function Home() {
         }
         Cookies.set(`role`, `${role}`);
         Cookies.set("token", `${token}`);
+        setAuthToken(token);
         dispatch(instituteLogin());
         navigate("/institute");
       } else {
@@ -115,8 +120,9 @@ export default function Home() {
         theme: "dark",
       });
     }
+    setIsloading(false);
   };
-
+  
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
@@ -257,9 +263,18 @@ export default function Home() {
             </div>
             <button
               onClick={() => handleSubmit(onSubmit)}
+              disabled={isLoading ? true : false}
               className=" bg-blue-700 text-white text-md w-full p-3 hover:bg-blue-800 hover:shadow-xl duration-500 rounded-lg"
             >
-              Login
+              {
+                isLoading ? 
+                  "loading...."
+                 :
+                
+                  "Login"
+                
+              }
+              
             </button>
           </form>
         </div>

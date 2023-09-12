@@ -50,6 +50,7 @@ export default function Create() {
   const [data, setData] = useState<any>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     register,
     formState: { errors },
@@ -108,6 +109,7 @@ export default function Create() {
   };
 
   const onSubmit: SubmitHandler<StudentCreateForm> = async (data: any) => {
+    setIsLoading(true)
     const { message, status } = await createInstituteStudent(
       data.firstname,
       data.lastname,
@@ -143,7 +145,7 @@ export default function Create() {
         progress: undefined,
         theme: "dark",
       });
-
+      setIsLoading(false);
       reset();
     }
   };
@@ -465,8 +467,11 @@ export default function Create() {
                 <button
                   className=" bg-primary text-white p-3 rounded-lg hover:shadow-xl"
                   type="submit"
+                  disabled={isLoading?true:false}
                 >
-                  Create Student
+                  {
+                    isLoading ? "creating..." : "Create Student"
+                  }
                 </button>
               </div>
             </div>

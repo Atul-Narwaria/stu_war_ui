@@ -51,3 +51,11 @@ export const deleteCity = async (id: string) => {
         return { code: 500, message: e.message }
     }
 }
+export const getCitybyId = async (id:any) => {
+    try {
+        const get = await instance.get(`/location/city/get/city/${id}`);
+        return get.data
+    } catch (e: any) {
+        return { code: 500, message: e.message }
+    }
+}

@@ -10,7 +10,7 @@ import {
   getActiveCountry,
   updateCountryStatus,
 } from "../../service/admin/location/country.service";
-import { FaEye, FaEyeSlash, FaTrash } from "react-icons/fa";
+import { FaEdit, FaEye, FaEyeSlash, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Skeleton from "@mui/material/Skeleton";
 import {
@@ -34,13 +34,16 @@ import {
   getInstituteStudentsSearch,
   updateInstitueStundetStatus,
 } from "../../service/institute/student.service";
-
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { encryptUUID } from "../../helper/encryptionKey";
 export default function PaginationDataGrid(props: {
   name: String;
   refresh?: number;
   height?: string;
 }) {
-  const [loading, setloading] = useState<boolean>(true);
+  const navigate = useNavigate();
+  const [loading, setloading] = useState<boolean>(false);
   const [query, setQuery] = useState<any>(null);
   let columns: any = [];
   let [tableRow, settableRow] = useState([]);
@@ -52,7 +55,13 @@ export default function PaginationDataGrid(props: {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRow, setTotalRow] = useState(0);
+
+
+  
+
   let fetchAllInstituteStudents = async () => {
+   
+    setloading(true)
     let get;
     if (query === null || query === undefined) {
       get = await getInstituteStudents(page);
@@ -127,41 +136,67 @@ export default function PaginationDataGrid(props: {
               });
               fetchAllInstituteStudents();
             }
-            setloading(false);
+          };
+          const handlepEdit = async () => {
+            let  key = encryptUUID(params.row.uuid)
+ 
+            navigate(`/institute/student/edit/${key}`)
           };
           const handlepDelete = async () => {
+            Swal.fire({
+              title: 'Are you sure?',
+              text: 'You will not be able to recover this item! And also delete all data from this user',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Yes, delete it!',
+            }).then(async(result) => {
             setloading(true);
-            const { message, status } = await deleteInstituteStudent(
-              params.row.uuid
-            );
-            if (status == "error") {
-              toast.error(message, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-              });
-            } else {
-              toast.success(message, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-              });
-              fetchAllInstituteStudents();
-            }
+
+              if (result.isConfirmed) {
+                const { message, status } = await deleteInstituteStudent(
+                  params.row.uuid
+                );
+                if (status == "error") {
+                  toast.error(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                } else {
+                  toast.success(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  fetchAllInstituteStudents();
+                }
             setloading(false);
+
+                Swal.fire('Deleted!', 'The item has been deleted.', 'success');
+              }
+              setloading(false);
+            });
+
+           
           };
           return (
             <div className="flex gap-4 flex-row">
+              <FaEdit 
+                onClick={handlepEdit}
+                className=" text-blue-700 hover:cursor-pointer text-lg"
+              />
               {params.row.status == true ? (
                 <>
                   {params.row.status}
@@ -206,14 +241,14 @@ export default function PaginationDataGrid(props: {
   };
   return (
     <>
-      {loading ? (
+      {/* { loading ? (
         <Skeleton
           animation="wave"
           variant="rounded"
           sx={{ background: "gray", width: 1 }}
           height={props.height ? props.height : 400}
         />
-      ) : (
+      ) : ( */}
         <Box
           sx={{ height: props.height ? props.height : 400, width: 1 }}
           className={` shadow-md rounded-xl p-2 bg-gray-50`}
@@ -243,7 +278,8 @@ export default function PaginationDataGrid(props: {
             // Set the total row count
           />
         </Box>
-      )}
+      {/* // ) */}
+      {/* } */}
     </>
   );
 }

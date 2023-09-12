@@ -9,6 +9,14 @@ export const getAllStates = async () => {
         return { code: 500, message: e.message }
     }
 }
+export const getStatesbyId = async (id:any) => {
+    try {
+        const get = await instance.get(`/location/state/get/state/${id}`);
+        return get.data
+    } catch (e: any) {
+        return { code: 500, message: e.message }
+    }
+}
 export const getActiveStatesByCountry = async (id: string) => {
     try {
         const get = await instance.get(`/location/state/get/active/country/${id}`)
