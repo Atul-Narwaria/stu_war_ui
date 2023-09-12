@@ -12,6 +12,7 @@ import { getActiveCountry } from "../../../service/admin/location/country.servic
 import { Autocomplete, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { editInstitueTeacherStatus, getInstituteTeacherById } from "../../../service/institute/teacher.service";
 
 
 interface StudentUpdateForm {
@@ -83,7 +84,7 @@ const navigate = useNavigate()
     const api = async () => {
       const key = decryptUUID(id)
       setuserId(key);
-        const getUser = await getInstituteStudentsById(decryptUUID(id));
+        const getUser = await getInstituteTeacherById(decryptUUID(id));
         if(getUser) {
           setUserData(getUser);
           setName(getUser.message?.firstName)
@@ -91,29 +92,29 @@ const navigate = useNavigate()
           setEmail(getUser.message?.email)
           setPhone(getUser.message?.phone)
           setDob(getUser.message?.dob)
-          setAddress(getUser.message?.studentAddress[0]?.Address)
-          setPin(getUser.message?.studentAddress[0]?.pin)
+          setAddress(getUser.message?.teacherAddress[0]?.Address)
+          setPin(getUser.message?.teacherAddress[0]?.pin)
           setGender(getUser.message?.gender)
         } 
         
-        const get1 = await getActiveStatesByCountry(getUser.message?.studentAddress[0]?.fkcountryId);
+        const get1 = await getActiveStatesByCountry(getUser.message?.teacherAddress[0]?.fkcountryId);
         console.log(get1);
         if(get1.status === "success"){
           let dfState = get1.message 
           if(dfState){
-            setDefaultState(dfState?.find((option: any) => option?.id === getUser.message?.studentAddress[0]?.fkstateId ))
-            handleCityByState(getUser.message?.studentAddress[0]?.fkcountryId,getUser.message?.studentAddress[0]?.fkstateId)
-            setSelectedState( getUser.message?.studentAddress[0]?.fkstateId)
+            setDefaultState(dfState?.find((option: any) => option?.id === getUser.message?.teacherAddress[0]?.fkstateId ))
+            handleCityByState(getUser.message?.teacherAddress[0]?.fkcountryId,getUser.message?.teacherAddress[0]?.fkstateId)
+            setSelectedState( getUser.message?.teacherAddress[0]?.fkstateId)
           }
         }
         
        
-        const get2 = await getCityByStateCountry(getUser.message?.studentAddress[0]?.fkcountryId, getUser.message?.studentAddress[0]?.fkstateId);
+        const get2 = await getCityByStateCountry(getUser.message?.teacherAddress[0]?.fkcountryId, getUser.message?.teacherAddress[0]?.fkstateId);
        if(get2.status === "success"){
         let dfCity = get2.message;
         if(dfCity){
-          setDefaultCity(dfCity?.find((option: any) => option?.id === getUser.message?.studentAddress[0]?.fkcityId ))
-          setSelectedCity(getUser.message?.studentAddress[0]?.fkcityId)
+          setDefaultCity(dfCity?.find((option: any) => option?.id === getUser.message?.teacherAddress[0]?.fkcityId ))
+          setSelectedCity(getUser.message?.teacherAddress[0]?.fkcityId)
         }
        }
       const get = await getActiveCountry();
@@ -151,7 +152,7 @@ const navigate = useNavigate()
   };
   const onSubmit: SubmitHandler<StudentUpdateForm> = async (data: any) => {
     setIsLoading(true)
-    const { message, status } = await editInstitueStundetStatus(
+    const { message, status } = await editInstitueTeacherStatus(
       userId,
       data.firstname,
       data.lastname,
@@ -189,7 +190,7 @@ const navigate = useNavigate()
       });
       setIsLoading(false);
       reset();
-      navigate("/institute/student")
+      navigate("/institute/teacher")
     }
   };
   console.log(selectCity);

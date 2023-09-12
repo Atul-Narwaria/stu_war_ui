@@ -1,124 +1,64 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { decryptUUID } from "../../../helper/encryptionKey";
-import { SubmitHandler, useForm } from "react-hook-form";
-import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
+import TextField from "@mui/material/TextField";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
-import { editInstitueStundetStatus, getInstituteStudentsById } from "../../../service/institute/student.service";
-import { getCityByStateCountry, getCitybyId } from "../../../service/admin/location/city.service";
-import { getActiveStatesByCountry, getStatesbyId } from "../../../service/admin/location/state.service";
 import { getActiveCountry } from "../../../service/admin/location/country.service";
-import { Autocomplete, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { getActiveStatesByCountry } from "../../../service/admin/location/state.service";
+import { getCityByStateCountry } from "../../../service/admin/location/city.service";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
-
-interface StudentUpdateForm {
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import { Autocomplete } from "@mui/material";
+import {
+  createInstituteStudent,
+} from "../../../service/institute/student.service";
+import dayjs from "dayjs";
+import Basicmodel from "../../../components/modals/Basicmodel";
+import ExcelImportService from "../../../import/ExcelImportService";
+import { createInstituteTeacher } from "../../../service/institute/teacher.service";
+interface StudentCreateForm {
   firstname: string;
   lastname: string;
   email: string;
   phone: number;
   dob: string;
-  gender?: string;
-  county?: string;
-  state?: string;
-  city?: string;
+  gender: string;
+  county: string;
+  state: string;
+  city: string;
   address: string;
   pin: string;
 }
 
-export default function Edit() {
-  const [userId, setuserId] = useState<any>("");
-  const {id} = useParams();
+
+export default function Create() {
   const [countryList, setCountrylist] = useState([]);
   const [defaultCountry, setDefaultCountry] = useState([]);
   const [statelist, setStateList] = useState([]);
-  const [selectedState, setSelectedState] = useState<any>("");
+  const [selectedState, setSelectedState] = useState<any>(null);
   const [citylist, setCityList] = useState([]);
-  const [selectCity, setSelectedCity] = useState<any>("");
+  const [selectCity, setSelectedCity] = useState<any>(null);
   const [selectCountry, setSelectedCounty] = useState<any>("");
-  const [gender, setGender] = useState<any>("");
+  const [gender, setGender] = useState<any>("male");
   const [dob, setDob] = useState<any>(dayjs());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<any>(null);
-  const [data, setData] = useState<any>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [userData, setUserData] = useState<any>([]);
-  const [defaultState, setDefaultState] = useState<any>(null);
-  const [defaultCity, setDefaultCity] = useState<any>(null);
-const [name, setName] = useState<any>("");
-const [lastname, setLastName] = useState<any>("");
-const [phone, setPhone] = useState<any>("");
-const [email, setEmail] = useState<any>("");
-const [address, setAddress] = useState<any>("");
-const [pin, setPin] = useState<any>("");
-
-
-const navigate = useNavigate()
   const {
     register,
     formState: { errors },
     reset,
     handleSubmit,
-  } = useForm<StudentUpdateForm>({
-    values: {
-      firstname: name,
-      lastname: lastname,
-      email: email,
-      phone: phone,
-      dob: dob,
-      address: address,
-      pin: pin,
-    }
-  });
-
-
-  
+  } = useForm<StudentCreateForm>();
   useEffect(() => {
-   
-
     const api = async () => {
-      const key = decryptUUID(id)
-      setuserId(key);
-        const getUser = await getInstituteStudentsById(decryptUUID(id));
-        if(getUser) {
-          setUserData(getUser);
-          setName(getUser.message?.firstName)
-          setLastName(getUser.message?.lastName)
-          setEmail(getUser.message?.email)
-          setPhone(getUser.message?.phone)
-          setDob(getUser.message?.dob)
-          setAddress(getUser.message?.studentAddress[0]?.Address)
-          setPin(getUser.message?.studentAddress[0]?.pin)
-          setGender(getUser.message?.gender)
-        } 
-        
-        const get1 = await getActiveStatesByCountry(getUser.message?.studentAddress[0]?.fkcountryId);
-        console.log(get1);
-        if(get1.status === "success"){
-          let dfState = get1.message 
-          if(dfState){
-            setDefaultState(dfState?.find((option: any) => option?.id === getUser.message?.studentAddress[0]?.fkstateId ))
-            handleCityByState(getUser.message?.studentAddress[0]?.fkcountryId,getUser.message?.studentAddress[0]?.fkstateId)
-            setSelectedState( getUser.message?.studentAddress[0]?.fkstateId)
-          }
-        }
-        
-       
-        const get2 = await getCityByStateCountry(getUser.message?.studentAddress[0]?.fkcountryId, getUser.message?.studentAddress[0]?.fkstateId);
-       if(get2.status === "success"){
-        let dfCity = get2.message;
-        if(dfCity){
-          setDefaultCity(dfCity?.find((option: any) => option?.id === getUser.message?.studentAddress[0]?.fkcityId ))
-          setSelectedCity(getUser.message?.studentAddress[0]?.fkcityId)
-        }
-       }
       const get = await getActiveCountry();
       if (get?.status == "success") {
         let data = get?.message;
+        console.log(data);
         setDefaultCountry(
           data?.find((option: any) => option?.CounrtyName === "India")
         );
@@ -131,14 +71,12 @@ const navigate = useNavigate()
         setSelectedCounty(county?.id);
         handleStateByCountry(county?.id);
         setCountrylist(data);
-
-        
       }
     };
 
     api();
-  },[])
-
+   
+  }, []);
   const handleStateByCountry = async (value: string) => {
     const get = await getActiveStatesByCountry(value);
     setSelectedCounty(value);
@@ -147,12 +85,13 @@ const navigate = useNavigate()
   const handleCityByState = async (countyId: string, StateId: string) => {
     setSelectedState(StateId);
     const get = await getCityByStateCountry(countyId, StateId);
+    console.log(get.message);
     setCityList(get.message);
   };
-  const onSubmit: SubmitHandler<StudentUpdateForm> = async (data: any) => {
+
+  const onSubmit: SubmitHandler<StudentCreateForm> = async (data: any) => {
     setIsLoading(true)
-    const { message, status } = await editInstitueStundetStatus(
-      userId,
+    const { message, status } = await createInstituteTeacher(
       data.firstname,
       data.lastname,
       data.email,
@@ -176,6 +115,7 @@ const navigate = useNavigate()
         progress: undefined,
         theme: "dark",
       });
+      setIsLoading(false)
     } else {
       toast.success(message, {
         position: "top-right",
@@ -189,23 +129,34 @@ const navigate = useNavigate()
       });
       setIsLoading(false);
       reset();
-      navigate("/institute/student")
     }
   };
-  console.log(selectCity);
   return (
     <>
-     <Breadcrumb name="Edit Student"></Breadcrumb>
-     <div className=" bg-white mt-3 md:p-4 p-2    rounded-lg shadow-md   ">
+      <Breadcrumb name="Create Teacher">
+        <button className=" text-white bg-green-700 p-2 rounded-lg hover:shadow-lg">
+          <a href="http://studiorinternational.in/atul/bulk_student.xlsx">
+            Download Sample
+          </a>
+        </button>
+        <div>
+        
+        </div>
+        <button
+          onClick={() => setIsModalOpen(!isModalOpen)}
+          className=" text-white bg-primary p-2 rounded-lg hover:shadow-lg"
+        >
+          Create Bulk Teacher
+        </button>
+      </Breadcrumb>
+      <div className=" bg-white mt-3 md:p-4 p-2    rounded-lg shadow-md   ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-2  grid-col-1 ">
             <div className="p-1 md:p-5 md:border-r-2 ">
               <p className="mb-3 text-gray-500">Basic Info</p>
               <div className="grid grid-cols-1 gap-2 mb-2">
                 <TextField
-                
-            
-                error={errors.firstname ? true : false}
+                  error={errors.firstname ? true : false}
                   helperText={errors.firstname?.message}
                   {...register("firstname", {
                     required: "firstname required",
@@ -213,25 +164,17 @@ const navigate = useNavigate()
                       value: 3,
                       message: "minimun 3 character required",
                     },
-                    
                   })}
                   id="outlined-basic"
                   label="First Name *"
                   sx={{
                     width: 1,
                   }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                   variant="outlined"
                 />
               </div>
               <div className="grid grid-cols-1 gap-2 mb-2">
                 <TextField
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                 
                   error={errors.lastname ? true : false}
                   helperText={errors.lastname?.message}
                   {...register("lastname", {
@@ -252,9 +195,6 @@ const navigate = useNavigate()
               <div className="grid grid-cols-1 md:grid-cols-1 gap-2 mb-2 ">
                 <div>
                   <TextField
-                   InputLabelProps={{
-                    shrink: true,
-                  }}
                     error={errors.phone ? true : false}
                     {...register("phone", {
                       required: "phone required",
@@ -282,9 +222,6 @@ const navigate = useNavigate()
                   />
                 </div>
                 <TextField
-                   InputLabelProps={{
-                    shrink: true,
-                  }}
                   error={errors.email ? true : false}
                   {...register("email", {
                     pattern: {
@@ -306,10 +243,9 @@ const navigate = useNavigate()
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="Date of Birth *"
-                   value={dayjs(userData.message?.dob)}
+                    defaultValue={dayjs()}
                     disableFuture
                     onChange={(date: any) => {
-                      
                       setDob(
                         `${date?.year()}-${date?.month()}-${date?.date()}`
                       );
@@ -338,8 +274,7 @@ const navigate = useNavigate()
                     color: gender == null ? "#e74c3c" : "",
                     marginTop: "-10px",
                   }}
-                  value={gender}
-                  onChange={(event:any) => {
+                  onChange={(event) => {
                     setGender(event.target.value);
                   }}
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -390,15 +325,13 @@ const navigate = useNavigate()
                 <Autocomplete
                   disablePortal
                   id="combo-box-demo"
-                 value={defaultState}
                   options={statelist}
                   getOptionLabel={(option: any) =>
-                    option?.stateName ? option.stateName : "select state *"
+                    option?.stateName ? option?.stateName : "select state *"
                   }
                   sx={{ width: 1, marginBottom: "10px" }}
                   onChange={(event: any, newValue: any | null) => {
                     setSelectedState(newValue?.id);
-                    setDefaultState(newValue)
                     handleCityByState(selectCountry, newValue?.id);
                   }}
                   renderInput={(params) => (
@@ -427,11 +360,9 @@ const navigate = useNavigate()
                   disablePortal
                   id="combo-box-demo"
                   options={citylist}
-                  value={defaultCity}
                   getOptionLabel={(option: any) => option?.cityName}
                   sx={{ width: 1 }}
                   onChange={(event: any, newValue: any | null) => {
-                    setDefaultCity(newValue)
                     setSelectedCity(newValue?.id);
                   }}
                   renderInput={(params) => (
@@ -455,9 +386,6 @@ const navigate = useNavigate()
                   )}
                 />
                 <TextField
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                   multiline={true}
                   rows={3}
                   error={errors.address ? true : false}
@@ -475,9 +403,6 @@ const navigate = useNavigate()
                 />
 
                 <TextField
-                   InputLabelProps={{
-                    shrink: true,
-                  }}
                   error={errors.pin ? true : false}
                   {...register("pin", {
                     required: "pin required",
@@ -500,7 +425,7 @@ const navigate = useNavigate()
                   disabled={isLoading?true:false}
                 >
                   {
-                    isLoading ? "updating..." : "update Student"
+                    isLoading ? "creating..." : "Create Student"
                   }
                 </button>
               </div>
@@ -508,6 +433,13 @@ const navigate = useNavigate()
           </div>
         </form>
       </div>
+      <Basicmodel
+        isOpen={isModalOpen}
+        isClode={setIsModalOpen}
+        name="Upload Bluk Stundet"
+      >
+         <ExcelImportService name="InstitutebulkTeacher" />
+      </Basicmodel>
     </>
   );
 }

@@ -28,6 +28,12 @@ const InstStudentCreate = lazy(
   () => import("./pages/institute/student/Create")
 );
 const InstStudentEdit = lazy(() => import("./pages/institute/student/Edit"));
+const InstTeacher = lazy(() => import("./pages/institute/teacher/Teacher"));
+const InstTeacherCreate = lazy(() => import("./pages/institute/teacher/Create"));
+const InstTeacherEdit = lazy(() => import("./pages/institute/teacher/Edit"));
+
+
+
 function App() {
   const isAdmin = useSelector((state: any) => state.auth.isLoggedIn);
   const isinstituteLogin = useSelector(
@@ -137,6 +143,18 @@ function App() {
             <Route
               path="student/edit/:id"
               element={isinstituteLogin ? <InstStudentEdit /> : <WebHome />}
+            />
+            <Route
+              path="teacher"
+              element={isinstituteLogin ? <InstTeacher /> : <WebHome />}
+            />
+            <Route
+              path="teacher/create"
+              element={isinstituteLogin ? <InstTeacherCreate /> : <WebHome />}
+            />
+            <Route
+              path="teacher/edit/:id"
+              element={isinstituteLogin ? <InstTeacherEdit /> : <WebHome />}
             />
           </Route>
         </Routes>

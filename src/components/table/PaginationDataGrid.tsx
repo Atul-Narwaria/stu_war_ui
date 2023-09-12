@@ -37,12 +37,19 @@ import {
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { encryptUUID } from "../../helper/encryptionKey";
+import dayjs from "dayjs";
+import { deleteInstituteTeacher, getInstituteTeacher, getInstituteTeacherSearch, updateInstitueTeacherStatus } from "../../service/institute/teacher.service";
 export default function PaginationDataGrid(props: {
   name: String;
   refresh?: number;
   height?: string;
 }) {
   const navigate = useNavigate();
+  const [columnWidths, setColumnWidths] = useState({});
+
+  const handleColumnWidthChange = (newColumnWidths:any) => {
+    setColumnWidths(newColumnWidths);
+  };
   const [loading, setloading] = useState<boolean>(false);
   const [query, setQuery] = useState<any>(null);
   let columns: any = [];
@@ -82,7 +89,7 @@ export default function PaginationDataGrid(props: {
             admissionid: item.admissionId,
             email: item.email,
             phone: item.phone,
-            DOB: item.dob,
+            DOB: dayjs(item.date).format('YYYY-MM-DD'),
             gender: item.gender,
           });
         });
@@ -95,16 +102,16 @@ export default function PaginationDataGrid(props: {
   if (props.name === "instituteStudents") {
     columns = [
       { field: "id", headerName: "ID", width: 10 },
-      { field: "name", headerName: "Name", width: 200 },
-      { field: "email", headerName: "email", width: 120 },
-      { field: "phone", headerName: "phone", width: 240 },
-      { field: "DOB", headerName: "date of birth", width: 140 },
-      { field: "gender", headerName: "gender", width: 100 },
-      { field: "admissionid", headerName: "admission id", width: 200 },
+      { field: "name", headerName: "Name", width: 200 ,},
+      { field: "email", headerName: "email", width: 240 ,},
+      { field: "phone", headerName: "phone", width: 150 ,},
+      { field: "DOB", headerName: "date of birth", width: 150 ,},
+      { field: "gender", headerName: "gender", width: 100, },
+      { field: "admissionid", headerName: "admission id", width: 200, },
       {
         field: "actions",
         headerName: "Actions",
-        width: 200,
+        width: 150,
         renderCell: (params: any) => {
           const handlepUpdateStatus = async () => {
             setloading(true);
@@ -191,6 +198,7 @@ export default function PaginationDataGrid(props: {
 
            
           };
+          
           return (
             <div className="flex gap-4 flex-row">
               <FaEdit 
@@ -221,15 +229,184 @@ export default function PaginationDataGrid(props: {
       },
     ];
   }
+
+  let fetchAllInstituteTeacher = async () => {
+    setloading(true)
+    let get;
+    if (query === null || query === undefined) {
+      get = await getInstituteTeacher(page);
+    } else {
+      get = await getInstituteTeacherSearch(query);
+    }
+    setTotalPages(get.totalPage * pageSize);
+    setTotalRow(get.totalRow);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+          dt.push({
+            id: index + 1,
+            uuid: item.id,
+            status: item.status,
+            name: item.firstName + " " + item.lastName,
+            email: item.email,
+            phone: item.phone,
+            DOB: dayjs(item.date).format('YYYY-MM-DD'),
+            gender: item.gender,
+          });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+
+  if (props.name === "instituteTeacher") {
+    columns = [
+      { field: "id", headerName: "ID", width: 10 },
+      { field: "name", headerName: "Name", width: 200 ,},
+      { field: "email", headerName: "email", width: 240 ,},
+      { field: "phone", headerName: "phone", width: 150 ,},
+      { field: "DOB", headerName: "date of birth", width: 150 ,},
+      { field: "gender", headerName: "gender", width: 100, },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 150,
+        renderCell: (params: any) => {
+          const handlepUpdateStatus = async () => {
+            setloading(true);
+            const { message, status } = await updateInstitueTeacherStatus(
+              params.row.uuid,
+              !params.row.status
+            );
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstituteTeacher();
+            }
+          };
+          const handlepEdit = async () => {
+            let  key = encryptUUID(params.row.uuid)
+ 
+            navigate(`/institute/teacher/edit/${key}`)
+          };
+          const handlepDelete = async () => {
+            Swal.fire({
+              title: 'Are you sure?',
+              text: 'You will not be able to recover this item! And also delete all data from this user',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Yes, delete it!',
+            }).then(async(result) => {
+            setloading(true);
+
+              if (result.isConfirmed) {
+                const { message, status } = await deleteInstituteTeacher(
+                  params.row.uuid
+                );
+                if (status == "error") {
+                  toast.error(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                } else {
+                  toast.success(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  fetchAllInstituteTeacher();
+                }
+            setloading(false);
+
+                Swal.fire('Deleted!', 'The item has been deleted.', 'success');
+              }
+              setloading(false);
+            });
+
+           
+          };
+          
+          return (
+            <div className="flex gap-4 flex-row">
+              <FaEdit 
+                onClick={handlepEdit}
+                className=" text-blue-700 hover:cursor-pointer text-lg"
+              />
+              {params.row.status == true ? (
+                <>
+                  {params.row.status}
+                  <FaEye
+                    onClick={handlepUpdateStatus}
+                    className=" text-blue-700 hover:cursor-pointer text-lg"
+                  />
+                </>
+              ) : (
+                <FaEyeSlash
+                  onClick={handlepUpdateStatus}
+                  className=" text-blue-700 hover:cursor-pointer text-lg"
+                />
+              )}
+              <FaTrash
+                onClick={handlepDelete}
+                className=" text-red-700 hover:cursor-pointer text-lg"
+              />
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
   const [rowCountState, setRowCountState] = useState(totalRow || 0);
   useEffect(() => {
     if (props.name === "instituteStudents") {
       fetchAllInstituteStudents();
-    }
-
-    setRowCountState((prevRowCountState) =>
+      setRowCountState((prevRowCountState) =>
       totalRow !== undefined ? totalRow : prevRowCountState
     );
+    }
+    if (props.name === "instituteTeacher") {
+      fetchAllInstituteTeacher();
+      setRowCountState((prevRowCountState) =>
+      totalRow !== undefined ? totalRow : prevRowCountState
+    );
+    }
+
+    
   }, [props.refresh, page, pageSize, totalRow, query]);
   const onPaginationModelChange = (paginationModel: any) => {
     setPage(paginationModel.page + 1);
@@ -250,7 +427,7 @@ export default function PaginationDataGrid(props: {
         />
       ) : ( */}
         <Box
-          sx={{ height: props.height ? props.height : 400, width: 1 }}
+          sx={{ height: props.height ? props.height : 400, width: 1, flex:1 }}
           className={` shadow-md rounded-xl p-2 bg-gray-50`}
         >
           <DataGrid
@@ -267,6 +444,7 @@ export default function PaginationDataGrid(props: {
                 showQuickFilter: true,
               },
             }}
+          
             rowCount={rowCountState}
             columns={columns}
             loading={loading}
