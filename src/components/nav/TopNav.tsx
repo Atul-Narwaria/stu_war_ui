@@ -34,7 +34,6 @@ export default function TopNav(props: { open: boolean; setOpen: any }) {
     } else {
       setGreeting("Good Evening");
     }
-    console.log(currentHour);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {

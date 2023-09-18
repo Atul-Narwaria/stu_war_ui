@@ -17,21 +17,16 @@ export default function Breadcrumb(props: {
           : " md:grid-cols-2 place-content-center"
       }`}
     >
-      {props.backButton ? (
-        <div className=" flex gap-2">
+        <div className=" flex gap-2 hover:cursor-pointer">
           <FaAngleLeft
             onClick={() => navigate(-1)}
-            className=" text-gray-200 mt-[0.6rem] bg-gray-500 rounded-md shadow-lg ml-2 mr-1 "
+            className="hover:cursor-pointer  text-gray-200 mt-[0.6rem] bg-gray-500 rounded-md shadow-lg ml-2 mr-1 "
           />
           <p className=" text-white flex justify-start text-[1.3rem] font-sans   ">
             {props.name}
           </p>
         </div>
-      ) : (
-        <p className=" text-white flex justify-start text-[1.3rem] font-sans mx-2 md:mx-5  ">
-          {props.name}
-        </p>
-      )}
+       
       <div className=" flex justify-end gap-2   ">{props?.children}</div>
     </div>
   );

@@ -82,6 +82,19 @@ export const SideNav = (props: {
         icon: FaUsers,
         isEnd: false,
       },
+      {
+        name: "Course",
+        link: "/institute/course",
+        icon: FaUsers,
+        margin: true,
+        isEnd: false,
+      },
+      {
+        name: "Batch",
+        link: "/institute/batch",
+        icon: FaUsers,
+        isEnd: false,
+      },
     ];
   }
 

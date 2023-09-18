@@ -39,6 +39,7 @@ import { useNavigate } from "react-router-dom";
 import { encryptUUID } from "../../helper/encryptionKey";
 import dayjs from "dayjs";
 import { deleteInstituteTeacher, getInstituteTeacher, getInstituteTeacherSearch, updateInstitueTeacherStatus } from "../../service/institute/teacher.service";
+import { deleteInstituteCourse, getInstituteCourses, getInstituteCoursesSearch, updateInstitueCourseStatus } from "../../service/institute/course.service";
 export default function PaginationDataGrid(props: {
   name: String;
   refresh?: number;
@@ -391,6 +392,166 @@ export default function PaginationDataGrid(props: {
     ];
   }
 
+  let fetchAllInstituteCourses = async () => {
+    setloading(true)
+    let get;
+    if (query === null || query === undefined) {
+      get = await getInstituteCourses(page);
+    } else {
+      get = await getInstituteCoursesSearch(query);
+    }
+    setTotalPages(get.totalPage * pageSize);
+    setTotalRow(get.totalRow);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+          dt.push({
+            id: index + 1,
+            uuid: item.id,
+            status: item.status,
+            name: item.name,
+            image: item.image,
+            amount: item.amount,
+            duration:item.durantion,
+          });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+
+  if (props.name === "instituteCourses") {
+    columns = [
+      { field: "id", headerName: "ID", width: 10 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "image", headerName: "Image", width: 200,   editable: true,
+      renderCell: (params:any) => <img width="70" height="70" className="rounded-[50%]" src={params.value} />, },
+      { field: "amount", headerName: "Amount", width: 240 ,},
+      { field: "duration", headerName: "Duration", width: 150 ,},
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 150,
+        renderCell: (params: any) => {
+          const handlepUpdateStatus = async () => {
+            setloading(true);
+            const { message, status } = await updateInstitueCourseStatus(
+              params.row.uuid,
+              !params.row.status
+            );
+            if (status == "error") {
+              toast.error(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            } else {
+              toast.success(message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+              fetchAllInstituteCourses();
+            }
+          };
+          const handlepEdit = async () => {
+            let  key = encryptUUID(params.row.uuid)
+ 
+            navigate(`/institute/course/edit/${key}`)
+          };
+          const handlepDelete = async () => {
+            Swal.fire({
+              title: 'Are you sure?',
+              text: 'You will not be able to recover this item! And also delete all data from this Course',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Yes, delete it!',
+            }).then(async(result) => {
+            setloading(true);
+
+              if (result.isConfirmed) {
+                const { message, status } = await deleteInstituteCourse(
+                  params.row.uuid
+                );
+                if (status == "error") {
+                  toast.error(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                } else {
+                  toast.success(message, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  fetchAllInstituteCourses();
+                }
+            setloading(false);
+
+                Swal.fire('Deleted!', 'The item has been deleted.', 'success');
+              }
+              setloading(false);
+            });
+
+           
+          };
+          
+          return (
+            <div className="flex gap-4 flex-row">
+              <FaEdit 
+                onClick={handlepEdit}
+                className=" text-blue-700 hover:cursor-pointer text-lg"
+              />
+              {params.row.status == true ? (
+                <>
+                  {params.row.status}
+                  <FaEye
+                    onClick={handlepUpdateStatus}
+                    className=" text-blue-700 hover:cursor-pointer text-lg"
+                  />
+                </>
+              ) : (
+                <FaEyeSlash
+                  onClick={handlepUpdateStatus}
+                  className=" text-blue-700 hover:cursor-pointer text-lg"
+                />
+              )}
+              <FaTrash
+                onClick={handlepDelete}
+                className=" text-red-700 hover:cursor-pointer text-lg"
+              />
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
   const [rowCountState, setRowCountState] = useState(totalRow || 0);
   useEffect(() => {
     if (props.name === "instituteStudents") {
@@ -404,8 +565,14 @@ export default function PaginationDataGrid(props: {
       setRowCountState((prevRowCountState) =>
       totalRow !== undefined ? totalRow : prevRowCountState
     );
+    
     }
-
+    if (props.name === "instituteCourses") {
+      fetchAllInstituteCourses();
+      setRowCountState((prevRowCountState) =>
+      totalRow !== undefined ? totalRow : prevRowCountState
+    );
+    }
     
   }, [props.refresh, page, pageSize, totalRow, query]);
   const onPaginationModelChange = (paginationModel: any) => {

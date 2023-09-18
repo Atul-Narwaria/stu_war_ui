@@ -31,7 +31,12 @@ const InstStudentEdit = lazy(() => import("./pages/institute/student/Edit"));
 const InstTeacher = lazy(() => import("./pages/institute/teacher/Teacher"));
 const InstTeacherCreate = lazy(() => import("./pages/institute/teacher/Create"));
 const InstTeacherEdit = lazy(() => import("./pages/institute/teacher/Edit"));
-
+const InstCourse = lazy(() => import("./pages/institute/course/Course"));
+const InstCourseCreate = lazy(() => import("./pages/institute/course/CourseCreate"));
+const InstCourseEdit = lazy(() => import("./pages/institute/course/CourseEdit"));
+const InstSubCourse = lazy(() => import("./pages/institute/course/sub-course/SubCourse"));
+const InstSubCourseCreate = lazy(() => import("./pages/institute/course/sub-course/SubCourseCreate"));
+const InstSubCourseEdit = lazy(() => import("./pages/institute/course/sub-course/SubCourseEdit"));
 
 
 function App() {
@@ -155,6 +160,30 @@ function App() {
             <Route
               path="teacher/edit/:id"
               element={isinstituteLogin ? <InstTeacherEdit /> : <WebHome />}
+            />
+            <Route 
+            path="course"
+            element={isinstituteLogin ? <InstCourse /> : <WebHome />}
+            />
+             <Route 
+            path="course/create"
+            element={isinstituteLogin ? <InstCourseCreate /> : <WebHome />}
+            />
+             <Route 
+            path="course/edit/:id"
+            element={isinstituteLogin ? <InstCourseEdit /> : <WebHome />}
+            />
+            <Route 
+            path="course/sub-course"
+            element={isinstituteLogin ? <InstSubCourse /> : <WebHome />}
+            />
+             <Route 
+            path="course/sub-course/create"
+            element={isinstituteLogin ? <InstSubCourseCreate /> : <WebHome />}
+            />
+             <Route 
+            path="course/sub-course/edit/:id"
+            element={isinstituteLogin ? <InstSubCourseEdit /> : <WebHome />}
             />
           </Route>
         </Routes>
