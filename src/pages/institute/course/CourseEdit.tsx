@@ -116,7 +116,7 @@ export default function CourseEdit() {
 
   return (
     <>
-      <Breadcrumb name={` Edit Student (${name})`}>
+      <Breadcrumb name={` Edit Course (${name})`}>
       </Breadcrumb>
       <div className=" bg-white mt-3 md:p-4 p-2    rounded-lg shadow-md   ">
         <form onSubmit={handleSubmit(onSubmit)}>

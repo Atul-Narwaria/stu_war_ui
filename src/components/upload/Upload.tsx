@@ -94,11 +94,11 @@ url?:any
               className="block w-full text-lg p-3 text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
               id="file_input"
               type="file"
-              required
+              
             ></input>
             
             </div>
-          <button disabled={uploading ? true: false } className={`bg-gray-600  text-white px-4 rounded-lg ${uploading ? "bg-gray-400 ": null }`} onClick={handleUpload}>{
+          <button type="button" disabled={uploading ? true: false } className={`bg-gray-600  text-white px-4 rounded-lg ${uploading ? "bg-gray-400 ": null }`} onClick={handleUpload}>{
             uploading ? "uploading...." : "upload" 
           }</button>
         </div>

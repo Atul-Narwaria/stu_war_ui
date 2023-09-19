@@ -18,35 +18,35 @@ export const InstituteCreateSubCourse = async (name:string,amount:number,image:s
     }
 }
 
-export const getInstituteCourses = async (page?: number) => {
+export const getInstituteSubCourses = async (page?: number) => {
     try {
         let pg = 1;
         if (page) {
             pg = page
         }
-        const get = await instance.get(`/institute/course/get/all?page=${pg}`)
+        const get = await instance.get(`/institute/sub-course/get/all?page=${pg}`)
         return get.data
     } catch (e: any) {
         return { code: e.response.status, message: e.message }
     }
 }
 
-export const getInstituteCoursesSearch = async (query: any, page?: number) => {
+export const getInstituteSubCoursesSearch = async (query: any, page?: number) => {
     try {
         let pg = 1;
         if (page) {
             pg = page
         }
-        const get = await instance.get(`/institute/course/get/search?page=${pg}&query=${query}`)
+        const get = await instance.get(`/institute/sub-course/get/search?page=${pg}&query=${query}`)
         return get.data
     } catch (e: any) {
         return { code: e.response.status, message: e.message }
     }
 }
 
-export const updateInstitueCourseStatus = async (id: string, status: boolean) => {
+export const updateInstitueSubCourseStatus = async (id: string, status: boolean) => {
     try {
-        const get = await instance.put(`/institute/course/update/${id}`, {
+        const get = await instance.put(`/institute/sub-course/update/${id}`, {
             status: status
         })
         return get.data
@@ -54,38 +54,22 @@ export const updateInstitueCourseStatus = async (id: string, status: boolean) =>
         return { code: 500, message: e.message }
     }
 }
-export const deleteInstituteCourse = async (id: string) => {
+export const deleteInstituteSubCourse = async (id: string) => {
     try {
-        const get = await instance.delete(`/institute/course/delete/${id}`)
+        const get = await instance.delete(`/institute/sub-course/delete/${id}`)
         return get.data
     } catch (e: any) {
         return { code: 500, message: e.message }
     }
 }
-export const editInstitueCourseStatus = async (id: string|any, firstname: string,
-    lastname: string,
-    email: string,
-    phone: string,
-    dob: Date,
-    gender: string,
-    country: string,
-    state: string,
-    city: string,
-    address: string,
-    pin: string) => {
+export const editInstitueSubCourseStatus = async (id: string|any,  name:string,amount:number,image:string,durantion:number,description:string  ) => {
     try {
-        const get = await instance.put(`/institute/course/edit/${id}`, {
-                firstname,
-                lastname,
-                email,
-                phone,
-                dob,
-                gender,
-                country,
-                state,
-                city,
-                address,
-                pin
+        const get = await instance.put(`/institute/sub-course/edit/${id}`, {
+            name,
+            amount,
+            image,
+            durantion,
+            description  
         },
 
         )
@@ -94,17 +78,17 @@ export const editInstitueCourseStatus = async (id: string|any, firstname: string
         return { code: 500, message: e.message }
     }
 }
-export const getInstituteCoursesById = async (id: any) => {
+export const getInstituteSubCoursesById = async (id: any) => {
     try {
-        const get = await instance.get(`/institute/course/get/course/${id}`)
+        const get = await instance.get(`/institute/sub-course/get/sub-course/${id}`)
         return get.data
     } catch (e: any) {
         return { code: e.response.status, message: e.message }
     }
 }
-export const getInstituteCoursesActive = async () => {
+export const getInstituteSubCoursesActive = async () => {
     try {
-        const get = await instance.get(`/institute/course/get/active`)
+        const get = await instance.get(`/institute/sub-course/get/active`)
         return get.data
     } catch (e: any) {
         return { code: e.response.status, message: e.message }

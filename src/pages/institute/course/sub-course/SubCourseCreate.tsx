@@ -76,9 +76,9 @@ export default function SubCourseCreate() {
         progress: undefined,
         theme: "dark",
       });
-
       reset();
-     navigate("/institute/course") 
+      navigate("/institute/course") 
+  
       setIsLoading(false);
      
     }
