@@ -19,8 +19,6 @@ interface CourseCreateForm {
 export default function SubCourseCreate() {
   const [fileUrl , setFileUrl] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [courseList,setCourseList] = useState<any>([]);
-  const [selectedCourse, setSelectedCourse] = useState<any>();
   const navigate = useNavigate();
   const {
     register,
@@ -49,7 +47,6 @@ export default function SubCourseCreate() {
       return false;
     }
     const { message, status } = await InstituteCreateSubCourse(
-      selectedCourse,
       data.name,
       data.amount,
       fileUrl,
@@ -90,13 +87,7 @@ export default function SubCourseCreate() {
     setFileUrl(url)
 
   }
-  useEffect(()=>{
-      const handleActiveCourseList = async () => {
-        const get = await getInstituteCoursesActive();
-        setCourseList(get.message);
-      };
-      handleActiveCourseList()
-    },[])
+
 
   return (
     <>
@@ -106,42 +97,7 @@ export default function SubCourseCreate() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid md:grid-cols-1  grid-col-1 ">
             <div className="p-1 md:p-5 ">
-              <div>
-              <Autocomplete
-                  disablePortal
-                  id="combo-box-demo"
-                  options={courseList}
-                  getOptionLabel={(option: any) =>
-                    option?.name ? option?.name : "select state *"
-                  }
-                  sx={{ width: 1, marginBottom: "10px" }}
-                  onChange={(event: any, newValue: any | null) => {
-                    setSelectedCourse(newValue?.id);
-                  }}
-                  renderInput={(params) => (
-                    <>
-                      <TextField
-                        error={
-                          selectedCourse == null
-                            ? errors.course
-                              ? true
-                              : false
-                            : false
-                        }
-                        {...params}
-                        label="select course *"
-                        {...register("course", {
-                          required: "course  required",
-                        })}
-                        helperText={
-                          selectedCourse ? null : errors.course?.message
-                        }
-                      />
-                    </>
-                  )}
-                />
-
-              </div>
+              
               <div className="grid grid-cols-1 gap-1 mb-2">
                 <TextField
                   error={errors.name ? true : false}

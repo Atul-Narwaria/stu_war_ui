@@ -1,10 +1,9 @@
 import instance from "../instance"
 
 
-export const InstituteCreateSubCourse = async (courseId:string,name:string,amount:number,image:string,durantion:number,description:string) => {
+export const InstituteCreateSubCourse = async (name:string,amount:number,image:string,durantion:number,description:string) => {
     try {
         const get = await instance.post('/institute/sub-course/create', {
-            courseId,
             name,
             amount,
             image,

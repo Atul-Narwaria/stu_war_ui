@@ -2,8 +2,16 @@ import React, {  useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 import PaginationDataGrid from "../../../components/table/PaginationDataGrid";
+import BasicTabs from "../../../components/Tabs/BasicTabs";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
 
 export default function Course() {
+  const [currentTab, setCurrentTab] = useState<any>(0);
   const [render, setRender] = useState(1);
   const navigate = useNavigate();
   return (
@@ -24,6 +32,8 @@ export default function Course() {
       </Breadcrumb>
       <div className="mt-3">
         {/* <DataGridSkeleton /> */}
+        <div className="flex"></div>
+        <BasicTabs />
         <PaginationDataGrid
           name="instituteCourses"
           height="70vh"
