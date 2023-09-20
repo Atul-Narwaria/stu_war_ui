@@ -38,6 +38,7 @@ const InstSubCourse = lazy(() => import("./pages/institute/course/sub-course/Sub
 const InstSubCourseCreate = lazy(() => import("./pages/institute/course/sub-course/SubCourseCreate"));
 const InstSubCourseEdit = lazy(() => import("./pages/institute/course/sub-course/SubCourseEdit"));
 const InstBatch = lazy(() => import("./pages/institute/batch/Batch"));
+const InstCourseLink = lazy(() => import("./pages/institute/course/CourseLink"));
 
 function App() {
   const isAdmin = useSelector((state: any) => state.auth.isLoggedIn);
@@ -164,6 +165,10 @@ function App() {
             <Route 
             path="course"
             element={isinstituteLogin ? <InstCourse /> : <WebHome />}
+            /> 
+            <Route 
+            path="course/course_link"
+            element={isinstituteLogin ? <InstCourseLink /> : <WebHome />}
             />
              <Route 
             path="course/create"

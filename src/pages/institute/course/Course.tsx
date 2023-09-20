@@ -28,6 +28,12 @@ export default function Course() {
         >
         Sub-Course
         </button>
+        <button
+          onClick={() => navigate("/institute/course/course_link")}
+          className="bg-primary text-white px-10 py-2 rounded-lg shadow-lg"
+        >
+        Link Course
+        </button>
       </Breadcrumb>
       <div className="mt-3">
         <PaginationDataGrid

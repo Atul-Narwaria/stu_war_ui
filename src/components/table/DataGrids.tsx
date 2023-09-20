@@ -37,7 +37,7 @@ export default function DataGrids(props: {
 }) {
   const [loading, setloading] = useState<boolean>(true);
   let columns: any = [];
-  let [tableRow, settableRow] = useState([]);
+    let [tableRow, settableRow] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
