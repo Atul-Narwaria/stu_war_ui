@@ -97,6 +97,40 @@ export const SideNav = (props: {
       },
     ];
   }
+  else if (props.type === "teacher") {
+    menus = [
+      {
+        name: "Home",
+        link: "/teacher",
+        icon: MdOutlineDashboard,
+        isEnd: true,
+      },
+      {
+        name: "Batches",
+        link: "/teacher/batches",
+        icon: FaUsers,
+        isEnd: false,
+      },
+     
+    ];
+  }
+  else if (props.type === "studnet") {
+    menus = [
+      {
+        name: "Home",
+        link: "/student",
+        icon: MdOutlineDashboard,
+        isEnd: true,
+      },
+      {
+        name: "Batches",
+        link: "/student/batches",
+        icon: FaUsers,
+        isEnd: false,
+      },
+     
+    ];
+  }
 
   return (
     <section className="flex gap-6 absolute z-20">

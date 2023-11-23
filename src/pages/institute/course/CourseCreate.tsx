@@ -16,6 +16,7 @@ interface CourseCreateForm {
 export default function CourseCreate() {
   const [fileUrl , setFileUrl] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const navigate = useNavigate();
   const {
     register,

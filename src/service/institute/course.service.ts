@@ -95,3 +95,12 @@ export const getInstituteCoursesActive = async () => {
         return { code: e.response.status, message: e.message }
     }
 }
+
+export const getInstituteCoursesSubCourseList = async (id:string) => {
+    try {
+        const get = await instance.get(`/institute/course/get/sub-course-list/${id}`)
+        return get.data
+    } catch (e: any) {
+        return { code: e.response.status, message: e.message }
+    }
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormControl from "@mui/material/FormControl";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import InputLabel from "@mui/material/InputLabel";
@@ -11,9 +11,14 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
-import { instituteLogin, login } from "../../store/auth";
+import { instituteLogin, login, studentLogin, teacherLogin } from "../../store/auth";
 import { InstituteLogin } from "../../service/institute/institute.service";
 import { setAuthToken } from "../../service/AuthConfig";
+import { TeacherLogin } from "../../service/teacher/teacher.service";
+import {QRCodeSVG} from 'qrcode.react';
+import Basicmodel from "../../components/modals/Basicmodel";
+import { getIpV4 } from "../../service/other.service";
+import { StudentLogin } from "../../service/student/student.service";
 
 interface IFormInput {
   email: string;
@@ -25,6 +30,10 @@ export default function Home() {
   const [isChecked, setIsChecked] = useState(false);
   const [Logintype, setLogintype] = useState("student");
   const [isLoading, setIsloading] = useState<boolean>(false);
+  const [isModalOpen , setIsModalOpen] = useState(false);
+  const [ipV4 , setIpV4] = useState<any>(null);
+  
+
   const {
     register,
     formState: { errors },
@@ -34,6 +43,17 @@ export default function Home() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
+
+
+const getIp = async() =>{
+    const get:any = await getIpV4();
+    if(get.status === "success"){
+      console.log(get.message)
+      let url = `http://${get.message}:9090`;
+      setIpV4(url)
+    }
+}
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setIsloading(true)
@@ -108,7 +128,80 @@ export default function Home() {
           theme: "dark",
         });
       }
-    } else {
+    } 
+    else if (Logintype === "Teacher") {
+      const { code, message, status, token, role } = await TeacherLogin(
+        data.email,
+        data.password
+      );
+      if (code === 200) {
+        if (status === "error") {
+          toast.error(message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
+        Cookies.set(`role`, `${role}`);
+        Cookies.set("token", `${token}`);
+        setAuthToken(token);
+        dispatch(teacherLogin());
+        navigate("/teacher");
+      } else {
+        toast.error("incorrect email/password", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+    } 
+    else if (Logintype === "Student") {
+      const { code, message, status, token, role } = await StudentLogin(
+        data.email,
+        data.password
+      );
+      if (code === 200) {
+        if (status === "error") {
+          toast.error(message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
+        Cookies.set(`role`, `${role}`);
+        Cookies.set("token", `${token}`);
+        setAuthToken(token);
+        dispatch(studentLogin());
+        navigate("/student");
+      } else {
+        toast.error("incorrect email/password", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+    } 
+    else {
       toast.error("select login type", {
         position: "top-right",
         autoClose: 5000,
@@ -123,6 +216,7 @@ export default function Home() {
     setIsloading(false);
   };
   
+
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
@@ -136,9 +230,30 @@ export default function Home() {
         }}
       ></div>
       <div className="mx-[1rem] lg:mx-[8rem]   ">
-        <h3 className=" text-[2rem] font-semibold mt-[2vh] ">
+     <div className="flex flex-col md:flex-row justify-between">
+     <h3 className=" text-[2rem] font-semibold mt-[2vh] ">
           Welcome to Smart
         </h3>
+      <div>
+      <button
+          onClick={() => {setIsModalOpen(!isModalOpen);getIp()}}
+          className=" text-white bg-primary p-2 mt-5 rounded-lg hover:shadow-lg"
+        >
+         Open in other device
+        </button>
+        <Basicmodel 
+        width="100px"
+         isOpen={isModalOpen}
+         isClode={setIsModalOpen}
+         name="scan to continue.. "
+        >
+        <QRCodeSVG value={ipV4} style={{ width:"300px" }} />
+        
+        
+        </Basicmodel> 
+      </div>
+     </div>
+        
         <div className="grid grid-cols-2 md:grid-cols-3 gap-5 justify-around align-middle mt-[5vh]">
           <button
             onClick={(e: any) => {

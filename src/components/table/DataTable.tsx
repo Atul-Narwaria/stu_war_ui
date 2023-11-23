@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { DataGrid, GridRowSelectionModel, GridToolbar } from '@mui/x-data-grid';
 import { Box, Skeleton } from '@mui/material';
 
-export default function DataTable(props:{name:string, data:any, onSubmit:any, height?:number}) {
+export default function DataTable(props:{name:string, data:any,  onSubmit:any, height?:number}) {
     const [loading, setloading] = useState<boolean>(false);
     let [tableRow, settableRow] = useState([]);
     const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-
+  
 
     useEffect(()=>{
         if(props.name === 'linkCourse'){
@@ -27,13 +27,10 @@ export default function DataTable(props:{name:string, data:any, onSubmit:any, he
         }
     },[ props.data])
 
-  const handleSubmit = () => {
-    // Get the selected data based on the selected row IDs
-    const selectedData = rowSelectionModel.map((id:any) => props.data.find((item:any) => item.uuid === id.uuid));
-
-    // Send the selected data to the server
+  useEffect(() => {
+    const selectedData = rowSelectionModel.map((id:any) => props.data.find((item:any, index:number) => index === parseInt(id)-1));
     props.onSubmit(selectedData);
-  };
+  },[rowSelectionModel])
   let columns: any = [];
     if(props.name === 'linkCourse'){
         columns = [
@@ -63,7 +60,7 @@ export default function DataTable(props:{name:string, data:any, onSubmit:any, he
       ) : (
         <div
         //   sx={{ height: props.height ? props.height : 400, width: 1 }}
-          className={` ${props.height ? `h-[${props.height}]` : `h-[400]`} shadow-md rounded-xl p-2 bg-gray-50`}
+          className={` ${props.height ? `h-[${props.height}]` : `h-[400]`}  p-2 bg-white`}
         >
 <DataGrid
         rows={tableRow}
@@ -80,17 +77,23 @@ export default function DataTable(props:{name:string, data:any, onSubmit:any, he
             slots={{ toolbar: GridToolbar }}
             slotProps={{
               toolbar: {
+                csvOptions: { disableToolbarButton: true },
+                printOptions: { disableToolbarButton: true },
                 showQuickFilter: true,
                 quickFilterProps: { debounceMs: 500 },
               },
             }}
             
       />
-
-        <div className='my-3'>
-        <button onClick={handleSubmit} className=' bg-primary text-white py-2 px-3 rounded w-full' >Link Course</button>
-        </div>
-        </div>
+      {/* {
+        submit ? 
+         (
+          <div className="my-2">
+          <button onClick={handleSubmit} className=' bg-primary px-3 py-2 w-full text-white rounded-lg  '>Confirm </button>
+          </div>
+         ) : null
+      } */}
+      </div>
     )}
     </>
   );

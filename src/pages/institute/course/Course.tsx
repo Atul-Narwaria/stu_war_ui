@@ -2,6 +2,7 @@ import React, {  useState } from "react";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 import PaginationDataGrid from "../../../components/table/PaginationDataGrid";
+import BasicChips from './../../../components/chips/BasicChips';
 
 
 
@@ -33,6 +34,12 @@ export default function Course() {
           className="bg-primary text-white px-10 py-2 rounded-lg shadow-lg"
         >
         Link Course
+        </button>
+        <button
+          onClick={() => navigate("/institute/course/student/create")}
+          className="bg-primary text-white px-10 py-2 rounded-lg shadow-lg"
+        >
+        Student Course
         </button>
       </Breadcrumb>
       <div className="mt-3">

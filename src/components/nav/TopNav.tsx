@@ -7,7 +7,7 @@ import { FiMinimize } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/auth";
 import Cookies from "js-cookie";
-
+import moment from 'moment-timezone';
 export default function TopNav(props: { open: boolean; setOpen: any }) {
   const [fullScreen, setFullScreen] = useState(false);
   const [currentHour, setCurrentHour] = useState(0);
@@ -20,27 +20,28 @@ export default function TopNav(props: { open: boolean; setOpen: any }) {
     const handleFullscreenChange = () => {
       setFullScreen(!!document.fullscreenElement);
     };
-    const updateCurrentHour = () => {
-      const date = new Date();
-      const hour: number = date.getHours();
-      setCurrentHour(hour);
-    };
-    updateCurrentHour();
-    const interval = setInterval(updateCurrentHour, 3600000);
-    if (currentHour > 4 && currentHour < 12) {
-      setGreeting("Good Morning");
-    } else if (currentHour >= 12 && currentHour < 17) {
-      setGreeting("Good Afternoon");
-    } else {
-      setGreeting("Good Evening");
+    const desiredTimezone = 'Asia/Kolkata';
+    const currentTimeInIST = moment.tz(desiredTimezone);
+    const currentHourInIST = currentTimeInIST.hour();
+    const greeting = getGreeting(currentHourInIST);
+    function getGreeting(hour:any) {
+      if (hour >= 5 && hour < 12) {
+        setGreeting( 'Good morning');
+      } else if (hour >= 12 && hour < 17) {
+        setGreeting( 'Good afternoon');
+      } else if (hour >= 17 && hour < 20) {
+        setGreeting('Good evening');
+      } else {
+        setGreeting( 'Good night');
+      }
     }
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      clearInterval(interval);
+    
     };
   }, []);
+ 
 
   const enterFullscreen = () => {
     const element = document.documentElement;
@@ -165,11 +166,12 @@ export default function TopNav(props: { open: boolean; setOpen: any }) {
                     <button
                       onClick={() => {
                         Cookies.remove("token");
+                        Cookies.remove("role");
                         dispatch(logout());
                       }}
                       className={classNames(
-                        active ? "bg-gray-100 w-full" : "",
-                        "block px-4 py-2 text-sm text-gray-700 w-full justify-start text-left"
+                        active ? "bg-gray-100 w-full hover:cursor-pointer" : "",
+                        "hover:cursor-pointer block px-4 py-2 text-sm text-gray-700 w-full justify-start text-left"
                       )}
                     >
                       Logout

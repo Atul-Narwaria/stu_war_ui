@@ -6,6 +6,7 @@ import NotFound from "./pages/web/NotFound";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Skeleton from "@mui/material/Skeleton";
+import TeacherZoom from "./components/Zoom/TeacherZoom";
 
 const Home = lazy(() => import("./pages/admin/Home"));
 const AdminIndex = lazy(() => import("./pages/admin/Index"));
@@ -39,20 +40,41 @@ const InstSubCourseCreate = lazy(() => import("./pages/institute/course/sub-cour
 const InstSubCourseEdit = lazy(() => import("./pages/institute/course/sub-course/SubCourseEdit"));
 const InstBatch = lazy(() => import("./pages/institute/batch/Batch"));
 const InstCourseLink = lazy(() => import("./pages/institute/course/CourseLink"));
+const InstCourseSubCourseView = lazy(() => import("./pages/institute/course/SubCourseView"));
+const InstBatchCreate = lazy(() => import("./pages/institute/batch/BatchCreate"));
+const InstBatchEdit = lazy(() => import("./pages/institute/batch/BatchEdit"));
+const InstBatchStudent = lazy(() => import("./pages/institute/batch/BatchStudent"));
+const InstBatchStudentAdd = lazy(() => import("./pages/institute/batch/BatchStudentAdd"));
+const InstStundetCourse = lazy(() => import("./pages/institute/course/student/CourseStudent"));
+const InstStundetCourseCreate = lazy(() => import("./pages/institute/course/student/AddStudentCourse"));
+
+const TeacherIndex = lazy(() => import("./pages/teacher/Index"));
+const TeacherHome = lazy(() => import("./pages/teacher/Home"));
+const TeacherBatchAssignmentUpload = lazy(() => import("./pages/teacher/BatchAssignmentUpload"));
+const TeacherZooom = lazy(() => import("./components/Zoom/TeacherZoom"));
+const StudentZooom = lazy(() => import("./components/Zoom/StudentZoom"));
+
+const StudentIndex = lazy(() => import("./pages/student/Index"));
+const StudentHome = lazy(() => import("./pages/student/Home"));
 
 function App() {
   const isAdmin = useSelector((state: any) => state.auth.isLoggedIn);
   const isinstituteLogin = useSelector(
     (state: any) => state.auth.isInstituteLogin
   );
-  console.log(isinstituteLogin);
+  const isTeacherLogin = useSelector(
+    (state: any) => state.auth.isTeacherLogin
+  );
+  const isStudentLogin = useSelector(
+    (state: any) => state.auth.isStudentLogin
+  );
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (window.innerWidth > 750) {
       setOpen(true);
     }
   }, []);
-
+  console.log(process.env.ZOOM_CLIENT)
   return (
     <BrowserRouter>
       {/* <Routes>
@@ -183,6 +205,10 @@ function App() {
             element={isinstituteLogin ? <InstSubCourse /> : <WebHome />}
             />
              <Route 
+            path="course/sub-course/view/:id"
+            element={isinstituteLogin ? <InstCourseSubCourseView /> : <WebHome />}
+            />
+             <Route 
             path="course/sub-course/create"
             element={isinstituteLogin ? <InstSubCourseCreate /> : <WebHome />}
             />
@@ -190,11 +216,72 @@ function App() {
             path="course/sub-course/edit/:id"
             element={isinstituteLogin ? <InstSubCourseEdit /> : <WebHome />}
             />
+            <Route 
+            path="course/student/:id"
+            element={isinstituteLogin ? <InstStundetCourse /> : <WebHome />}
+            />
+              <Route 
+            path="course/student/create"
+            element={isinstituteLogin ? <InstStundetCourseCreate /> : <WebHome />}
+            />
               <Route 
             path="batch"
             element={isinstituteLogin ? <InstBatch /> : <WebHome />}
             />
+            <Route 
+            path="batch/create"
+            element={isinstituteLogin ? <InstBatchCreate /> : <WebHome />}
+            />
+            <Route 
+            path="batch/edit/:id"
+            element={isinstituteLogin ? <InstBatchEdit /> : <WebHome />}
+            />
+             <Route 
+            path="batch/students/:id"
+            element={isinstituteLogin ? <InstBatchStudent /> : <WebHome />}
+            />
+             <Route 
+            path="batch/students/add/:id"
+            element={isinstituteLogin ? <InstBatchStudentAdd /> : <WebHome />}
+            />
+
+         
+
           </Route>
+          <Route
+              path="/teacher/zoom_class/:meeting/:password"
+              element={isTeacherLogin ? <TeacherZooom /> : <WebHome />}
+            />
+          <Route
+            path="/teacher"
+            element={isTeacherLogin ? <TeacherIndex /> : <WebHome />}
+          >
+            
+            <Route
+              index
+              element={isTeacherLogin ? <TeacherHome /> : <WebHome />}
+            />
+            <Route
+              path="batch/assignemnt/upload/:batchid"
+              element={isTeacherLogin ? <TeacherBatchAssignmentUpload /> : <WebHome />}
+            />
+            
+            </Route>
+            <Route
+              path="/student/zoom_class/:meeting/:password"
+              element={isStudentLogin ? <StudentZooom /> : <WebHome />}
+            />
+            <Route
+            path="/student"
+            element={isStudentLogin ? <StudentIndex /> : <WebHome />}
+          >
+            
+            <Route
+              index
+              element={isStudentLogin ? <StudentHome /> : <WebHome />}
+            />
+            
+            </Route>
         </Routes>
       </Suspense>
     </BrowserRouter>

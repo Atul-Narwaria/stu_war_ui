@@ -31,11 +31,11 @@ export default function Basicmodel(props: {
   return (
     <>
       {props.isOpen ? (
-        <div className="modal-overlay  z-50 absolute top-[-8vh] left-0 right-0 bottom-0 bg-[#00000067] flex  justify-center items-center max-h-[100vh] overflow-auto">
+        <div className="modal-overlay  z-[9999] absolute h-[100vh]  left-0 right-0 bottom-0 bg-[#000000bd] flex  justify-center items-center max-h-[100vh] overflow-auto">
           <div
             ref={modalRef}
             className={`   modal-content bg-white p-4 rounded-lg shadow-lg relative top-[-0vh]  ${
-              props.width ? props.width : "min-w-[40vw]"
+              props.width ? `w-[${props.width}]` : "min-w-[40vw]"
             }`}
           >
             <p className=" font-semibold text-lg">{props.name}</p>
@@ -45,7 +45,7 @@ export default function Basicmodel(props: {
             >
               &times;
             </button>
-            <div className="mt-6">{props.children}</div>
+            <div className="mt-6">{props.children}</div>  
           </div>
         </div>
       ) : null}

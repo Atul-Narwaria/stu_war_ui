@@ -63,6 +63,18 @@ export const getInstituteStudents = async (page?: number) => {
         return { code: e.response.status, message: e.message }
     }
 }
+export const getInstituteStudentsActive = async (page?: number) => {
+    try {
+        let pg = 1;
+        if (page) {
+            pg = page
+        }
+        const get = await instance.get(`/institute/student/get/active?page=${pg}`)
+        return get.data
+    } catch (e: any) {
+        return { code: e.response.status, message: e.message }
+    }
+}
 export const getInstituteStudentsSearch = async (query: any, page?: number) => {
     try {
         let pg = 1;
