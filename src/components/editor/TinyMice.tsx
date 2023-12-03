@@ -5,9 +5,11 @@ import { Editor } from '@tinymce/tinymce-react';
 interface RichTextEditorProps {
   value: string;
   onChange: (content: string) => void;
+  height?: number;
+  type?:any
 }
 
-const TinyMice: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+const TinyMice: React.FC<RichTextEditorProps> = ({ value, onChange, height,type}) => {
   const handleEditorChange = (content: string) => {
     onChange(content);
   };
@@ -15,12 +17,11 @@ const TinyMice: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   return (
     <Editor
       apiKey="fk7ckyz9049ltoeac8przeu7vxxpspx47eb1mpjg3fz62exf"
-      initialValue={value}
-      
+      value={value}
+      disabled={type ? type : false}
       init={{
-        height: 500,
+        height: height ? height : 500,
         menubar: true,
-       
         toolbar:
           'undo redo | formatselect | bold italic | \
           alignleft aligncenter alignright alignjustify | \

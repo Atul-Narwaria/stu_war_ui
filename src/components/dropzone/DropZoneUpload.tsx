@@ -2,6 +2,7 @@ import { LinearProgress } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react'
 import {useDropzone} from 'react-dropzone'
 import { FaTimes } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 
 interface FileProgress {
@@ -12,12 +13,14 @@ interface FileProgress {
     filename: string;
     size:number,
     file:any,
+    type:any,
     controller: AbortController;
   }
 
 export default function DropZoneUpload(props:{
     status: any 
     data:any
+    maxFile?:number
    
   }) {
     const [fileProgress, setFileProgress] = useState<FileProgress>({});
@@ -25,12 +28,31 @@ export default function DropZoneUpload(props:{
     const [fileEntries, setFileEntries] = useState<FileEntry[]>([]);
    
     const onDrop = useCallback((acceptedFiles: File[]) => {
+      // const check =
+      // let data:any = [];
+      // if(acceptedFiles.length > 0) {
+      //   acceptedFiles.map((file:any)=>{
+      //     console.log(file)
+      //     if(file.size < 1310720){
+      //       if(file.type === 'application/pdf'){
+      //         data.push(file)
+      //       }
+      //     }else{
+      //       toast.error(`${file.name} should be less then 10mb`);
+      //     }
+      //   })
+      // } 
+
+      // console.log(data)
+      // console.log(acceptedFiles)
       const newEntries = acceptedFiles.map((file) => ({
         filename: file.name,
         size:file.size,
         file:file,
+        type:file.type,
         controller: new AbortController(),
       }));
+     
       setFileEntries((prevEntries) => [...prevEntries, ...newEntries]);
       setFileProgress({});
       setPendingFiles((prevPendingFiles) => [...prevPendingFiles, ...acceptedFiles]);
@@ -39,6 +61,7 @@ export default function DropZoneUpload(props:{
   
     const { getRootProps, getInputProps } = useDropzone({
       onDrop,
+      maxFiles: props.maxFile ? props.maxFile : 2,
       multiple: true,
     });
     
@@ -48,7 +71,7 @@ export default function DropZoneUpload(props:{
         let uploaded = [];
       for (const entry of entries) {
         const { filename,size,file, controller } = entry;
- 
+         
         // const file = pendingFiles.find((f) => f.name === filename);
   
         // if (!file) {

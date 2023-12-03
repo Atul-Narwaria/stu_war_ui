@@ -1,9 +1,10 @@
 import React from 'react';
 import "./Zoom.css";
-import { ZoomMtg } from '@zoomus/websdk';
+
 import { useParams } from 'react-router-dom';
 import { decryptUUID } from '../../helper/encryptionKey';
 import Cookies from 'js-cookie';
+import { ZoomMtg } from '@zoomus/websdk';
 ZoomMtg.setZoomJSLib('https://source.zoom.us/2.17.0/lib', '/av');
 
 ZoomMtg.preLoadWasm();
@@ -16,30 +17,43 @@ function StudentZoom() {
     let params:any = useParams();
   var authEndpoint = 'http://127.0.0.1:7000/api/institute/zoom/signature'
   var sdkKey = "MjrUGJm9R72Wtqq1npLgZA"
+  var sdkSecret = "AT1NNLz50oiKEJRjUeKgm6o6GyFseDjj"
   var meetingNumber:any =  decryptUUID(params.meeting);
   var passWord:any = decryptUUID(params.password);
-  var role = 0
+  var role:any = 0
   var userName = 'Atul'
-  var leaveUrl = 'http://localhost:9090/teacher'
+  var leaveUrl = 'http://localhost:9090/student'
 
-  function getSignature() {
-    let token:any = Cookies.get("token");
-    fetch(authEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json',
-        "Authorization":token
+  // function getSignature() {
+  //   let token:any = Cookies.get("token");
+  //   fetch(authEndpoint, {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json',
+  //       "Authorization":token
+  //   },
+  //     body: JSON.stringify({
+  //       meetingNumber: meetingNumber,
+  //       role: role
+  //     })
+  //   }).then(res => res.json())
+  //   .then(response => {
+  //     startMeeting(response.signature)
+  //   }).catch(error => {
+  //     console.error(error)
+  //   })
+  // }
+  ZoomMtg.generateSDKSignature({
+    meetingNumber:meetingNumber,
+    role: role,
+    sdkKey: sdkKey,
+    sdkSecret: sdkSecret,
+    success: function (signature:any) {
+      startMeeting(signature.result)
     },
-      body: JSON.stringify({
-        meetingNumber: meetingNumber,
-        role: role
-      })
-    }).then(res => res.json())
-    .then(response => {
-      startMeeting(response.signature)
-    }).catch(error => {
-      console.error(error)
-    })
-  }
+    error: function (error:any) {
+          console.log(error);
+        },
+})
   function startMeeting(signature:any) {
     const element:any = document.getElementById("zmmtg-root");
     if (element) {
@@ -48,6 +62,8 @@ function StudentZoom() {
     ZoomMtg.init({
       leaveUrl: leaveUrl,
       isSupportAV: true,
+      disableInvite: true,
+      
       success: (success:any) => {
         ZoomMtg.join({
           signature: signature,
@@ -68,7 +84,7 @@ function StudentZoom() {
       
     })
   }
-  getSignature();
+  // getSignature();
   return (
     <div className="App">
       loading....

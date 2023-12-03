@@ -6,12 +6,14 @@ export default function Basicmodel(props: {
   name: string;
   children: any;
   width?: any;
+  refClose?:boolean;
 }) {
   const modalRef: any = useRef();
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        props.isClode(false);
+        // props.refClose ? props.isClode(false) : null
+        props.isClode(false)
       }
     };
 

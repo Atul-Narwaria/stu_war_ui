@@ -35,6 +35,12 @@ import { InstituteCreateCourselink, deleteInstituteCourselink, deleteInstituteSt
 import { getInstituteCoursesSubCourseList } from "../../service/institute/course.service";
 import { getInstituteTeacher, getInstituteTeacherActiveAll } from "../../service/institute/teacher.service";
 import { createBatchTeacher } from "../../service/institute/batch.service";
+import { TeacherAllBatches, TeacherAllBatchesStudents, TeacherBatchAssignmentGet } from "../../service/teacher/teacherBatch.service";
+import Basicmodel from "../modals/Basicmodel";
+import DataTableShow from "./DataTableShow";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import { StudentBatchGet } from "../../service/student/studentBatch.service";
 
 export default function DataGrids(props: {
   name: string;
@@ -44,6 +50,9 @@ export default function DataGrids(props: {
   dataid?:string;
   background?:any
 }) {
+  const [open, setOpen] = useState(false)
+  const [render, setRender] = useState(0)
+  const [modelData, setModelDate] = useState<any>([]);
   let id:string = "NA";
   if(props.id){
     id = props.id;
@@ -55,7 +64,7 @@ export default function DataGrids(props: {
     page: 0,
     pageSize: 10,
   });
-
+  const navigate= useNavigate();
   let fetchActiveCountryData = async () => {
     const get = await getActiveCountry();
     let dt: any = [];
@@ -281,6 +290,8 @@ export default function DataGrids(props: {
       },
     ];
   }
+
+
 
   let fetch_AllCountryStateCity = async () => {
     const get = await getAllCountryStateCity();
@@ -989,7 +1000,112 @@ export default function DataGrids(props: {
   }
 
 
+  let teacherAllbatches = async () => {
+    const get = await TeacherAllBatches();
+    let dt: any = [];
+    console.log(get)
+    let datas= get.message;
+    console.log(datas)
+    datas.map((item: any, index: number) => {
+      dt.push({
+        id: index + 1,
+        name: item.batchId.name,
+        uuid: item.batchId.id,
+        start_time: item.batchId.start_time,
+        end_time: item.batchId.end_time,
+        weekdays:item.batchId.weekdays,
+        haveLiveClass:item.batchId.haveLiveClass,
+        batchLiveClass:item.batchId.batchLiveClass,
+        subCourses:item.batchId.subCourses?.name,
+      });
+    });
+    setloading(false);
+    settableRow(dt);
+  };
+  if (props.name === "teacherAllbatches") {
+    columns = [
+      { field: "id", headerName: "ID", width: 20 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "subCourses", headerName: "Subject ", width: 100 },
+      { field: "start_time", headerName: "Start Time ", width: 100 },
+      { field: "end_time", headerName: "End Time ", width: 100 },
+      { field: "weekdays", headerName: "Weekdays ", width: 250 },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 300,
+        renderCell: (params: any) => {
 
+            const handleStudents = async()=>{
+              setOpen(!open);
+                setModelDate({
+                  name:"teacherbatchesStudents",
+                  title: params.row.name+"  Students",
+                  batchid:params.row.uuid
+                 })
+            }
+        
+          return (
+            <div className="flex gap-4 flex-row">
+              <button onClick={handleStudents} className=" px-3 py-2 text-white bg-dark-purple rounded-lg">
+                  Students
+              </button>
+              <button onClick={(()=>navigate(`/teacher/batches/assignment/${params.row.uuid}`))} className=" px-3 py-2 text-white bg-blue-600 rounded-lg">
+                  Assignments/Notes
+              </button>
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
+  
+ 
+
+  let studentAllbatches = async () => {
+    const get = await StudentBatchGet();
+    let dt: any = [];
+    let datas= get.message;
+    console.log(datas)
+    datas.map((item: any, index: number) => {
+      dt.push({
+        id: index + 1,
+        name: item.bactch.name,
+        uuid: item.bactch.id,
+        start_time: item.bactch.start_time,
+        end_time: item.bactch.end_time,
+        weekdays:item.bactch.weekdays,
+      });
+    });
+    setloading(false);
+    settableRow(dt);
+  };
+  if (props.name === "studentAllbatches") {
+    columns = [
+      { field: "id", headerName: "ID", width: 20 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "start_time", headerName: "Start Time ", width: 130},
+      { field: "end_time", headerName: "End Time ", width: 130},
+      { field: "weekdays", headerName: "weekdays ", width: 320 },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 300,
+        renderCell: (params: any) => {
+          return (
+            <div className="flex gap-4 flex-row">
+              <button onClick={(()=>navigate(`/student/batches/assignment/${params.row.uuid}`))} className=" px-3 py-2 text-white bg-blue-600 rounded-lg">
+                  Assignments
+              </button>
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
+  
   useEffect(() => {
     if (props.name === "AdminActiveCountry" && props.refresh) {
       fetchActiveCountryData();
@@ -1021,6 +1137,14 @@ export default function DataGrids(props: {
     if(props.name === "activeTeacher" ) {
       activeTeacher();
     }
+    if(props.name === "teacherAllbatches" ) {
+      teacherAllbatches();
+    }
+    
+    if(props.name === "studentAllbatches"){
+      studentAllbatches();
+    }
+    
     
   }, [props.refresh]);
 
@@ -1080,7 +1204,7 @@ export default function DataGrids(props: {
             disableDensitySelector
             onRowClick={handleRowClick}
             columns={columns}
-            slots={{ toolbar: GridToolbar }}
+            slots={{ toolbar: GridToolbar }} 
             slotProps={{
               toolbar: {
                 csvOptions: { disableToolbarButton: true },
@@ -1092,6 +1216,17 @@ export default function DataGrids(props: {
           />
         </Box>
       )}
+      <Basicmodel refClose={false} isOpen={open} isClode={setOpen} name={modelData.title} >
+            {
+               props.name === 'teacherAllbatches' && modelData?.name === 'teacherbatchesStudents'   ? 
+               (
+                <>
+                 
+              <DataTableShow name={modelData.name} background={`rounded-xl p-2 bg-gray-50`} dataid={modelData.batchid} refresh={render} />
+              </>
+               ):null
+            }
+      </Basicmodel>
     </>
   );
 }

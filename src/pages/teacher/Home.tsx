@@ -169,7 +169,7 @@ export default function Home() {
                       }
                       </div>
                       <div>
-                      <button onClick={()=>navigate(`/teacher/batch/assignemnt/upload/${batch.id}`)}  className="mt-4 px-4 py-2 bg-dark-purple text-green-100 rounded-3xl hover:shadow-xl">Upload Task/Notes</button>
+                      <button onClick={()=>navigate(`/teacher/batches/assignemnt/upload/${batch.id}`)}  className="mt-4 px-4 py-2 bg-dark-purple text-green-100 rounded-3xl hover:shadow-xl">Upload Task/Notes</button>
                       </div>
                      </div>
                      </div>

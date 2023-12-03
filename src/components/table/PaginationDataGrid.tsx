@@ -10,7 +10,7 @@ import {
   getActiveCountry,
   updateCountryStatus,
 } from "../../service/admin/location/country.service";
-import { FaEdit, FaEye, FaEyeSlash, FaKey, FaList, FaTrash, FaUsers } from "react-icons/fa";
+import { FaAudible, FaCog, FaEdit, FaEye, FaEyeSlash, FaFile, FaFilePdf, FaFileWord, FaKey, FaList, FaStar, FaStop, FaTrash, FaUsers, FaVideo } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Skeleton from "@mui/material/Skeleton";
 import {
@@ -46,14 +46,22 @@ import { Dialog, Transition } from '@headlessui/react'
 import DataGrids from "./DataGrids";
 import Basicmodel from "../modals/Basicmodel";
 import Switch from "@mui/material/Switch";
+import { TeacherBatchAssignmentGet, TeacherBatchAssignmentSearchGet, TeacherBatchesAssignmentDelete } from "../../service/teacher/teacherBatch.service";
+import moment from "moment";
+import { StudentBatchAssignmentGet, StudentBatchAssignmentGetSearch } from "../../service/student/studentBatch.service";
+import { getLastpartFromString, isUrl } from "../../helper/Url";
+import { truncateHTMLChar } from "../../helper/helper";
+import { Tooltip } from "@mui/material";
+import ReactHtmlParser from 'react-html-parser';
 
 export default function PaginationDataGrid(props: {
   name: String;
   id?:any;
   refresh?: number;
   height?: any;
+  dataId?:any;
 }) {
-
+const [icons, setIcons] = useState<any>([]);
   const [open, setOpen] = useState(false)
   const [render, setRender] = useState(0)
   const cancelButtonRef = useRef(null)
@@ -1114,6 +1122,379 @@ export default function PaginationDataGrid(props: {
     ];
   }
 
+
+  let teacherBatchAssignment = async () => {
+    setloading(true)
+    let get;
+    if (query === null || query === undefined || query === "") {
+       get = await TeacherBatchAssignmentGet(props.dataId!);
+    } else {
+      get = await TeacherBatchAssignmentSearchGet(props.dataId!,query);
+    }
+    setTotalPages(get.totalPage * pageSize);
+    setTotalRow(get.totalRow);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+          let submissions = item.batchStudentsAssignment
+      dt.push({
+        id: index + 1,
+        name: item.name,
+        uuid: item.id,
+        media: item.media,
+        contents: item.contents,
+        submission_date:item.submission_date,
+        assignment_date:item.assignment_date,
+        submission:submissions.length,
+        students:item.batchMaster.batchLink.length
+      });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+
+  if (props.name === "teacherBatchAssignment") {
+    columns = [
+      { field: "id", headerName: "ID", width: 20 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "assignment_date", headerName: "Date ", width: 130,
+      renderCell: (params: any) => {
+        let date = moment(params.row.assignment_date,'YYYY-MM-DD').format('DD/MMM/YYYY')
+        return date 
+      } 
+      },
+      { field: "submission_date", headerName: "Submision date ", width: 130,
+      renderCell: (params: any) => {
+        let date = moment(params.row.submission_date).format('DD/MMM/YYYY')
+        return date 
+      }
+     },
+      { field: "media", headerName: "media ", width: 150 ,
+      renderCell: (params: any) => {
+         let html:any = [];
+        let spit:any = params.row.media.split(',');
+          if(spit.length > 0){
+            spit.map(async(item:any,index:number)=>{
+              let checkURL =  isUrl(item);
+              if(checkURL){
+                const lastPartAfterLastDot =  getLastpartFromString('.',item);
+                html.push({
+                  link:item,
+                  ext:lastPartAfterLastDot
+                })
+              }
+             })
+          }
+        return <>
+         <div className="flex gap-2">
+            {
+              html.length > 0 ? (
+                html.map((item:any,index:number)=>(
+                  item.ext === "exe" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-gray-500 text-white p-1 rounded-md"  >
+                    <FaStop />
+                    </a>
+                    </div>
+                  ) : 
+                  item.ext === "mp4" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaVideo />
+                    </a>
+                   </div>
+                  ) : item.ext === "mp3" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaAudible />
+                    </a>
+                    </div>
+                  ):  item.ext === "pdf" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaFilePdf />
+                    </a>
+                    </div>
+                  ):  item.ext === "docx" ? (
+                    <div key={index} className="flex gap-2 "> 
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaFileWord />
+                    </a>
+                    </div>
+                  ): (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaStar />
+                    </a>
+                    </div>
+                  )
+                                    
+                ))
+              ):null
+            }
+            </div>
+            </>
+      }
+      },
+      { field: "contents", headerName: "contents ", width: 150, 
+      renderCell: (params: any) => {
+        let trucate = truncateHTMLChar(params.row.contents,15);
+        console.log(trucate)
+        return (
+
+          <Tooltip title={ReactHtmlParser(params.row.contents)} arrow >
+            <div dangerouslySetInnerHTML={{ __html: trucate }} />
+          </Tooltip>
+        )
+      }
+      },
+      { field: "submission", headerName: "submissions ", width: 130 ,
+      renderCell: (params: any) => {
+        return <>
+          <div className="flex gap-2">
+            <div className="py-1 px-2 rounded-md bg-dark-blue text-white">
+              {
+                params.row.submission
+              }/
+              {
+              params.row.students
+              }
+           
+            </div>
+            <FaEye className="text-dark-purple hover:cursor-pointer text-3xl rounded-lg p-1" />
+          </div>
+        </> 
+      }
+      },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 300,
+        renderCell: (params: any) => {
+            const handleShow = async()=>{
+              navigate(`/teacher/batches/assignment/edit/${params.row.uuid}`);
+              // const get = await TeacherBatchesAssignmentShow()
+            }
+            const handleDelete = async()=>{
+              Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+              }).then(async(result) => {
+              setloading(true);
+  
+                if (result.isConfirmed) {
+                  const { message, status } = await TeacherBatchesAssignmentDelete(params.row.uuid)
+                  if (status == "error") {
+                    toast.error(message, {
+                      position: "top-right",
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
+                    });
+                  } else {
+                    toast.success(message, {
+                      position: "top-right",
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
+                    });
+                    teacherBatchAssignment();
+                  }
+              setloading(false);
+  
+                  Swal.fire('Deleted!', 'The item has been deleted.', 'success');
+                }
+                setloading(false);
+              });
+             
+            }
+          return (
+            <div className="flex gap-2 flex-row">
+              <FaEye onClick={handleShow} className="text-xl text-blue-600 hover:cursor-pointer " />
+              <FaTrash onClick={handleDelete} className=" text-xl text-red-600 hover:cursor-pointer " />
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
+  let studentBatchAssignment = async () => {
+    setloading(true)
+    let get;
+    if (query === null || query === undefined || query === "") {
+       get = await StudentBatchAssignmentGet(props.dataId!);
+    } else {
+      get = await StudentBatchAssignmentGetSearch(props.dataId!,query);
+    }
+    setTotalPages(get.totalPage * pageSize);
+    setTotalRow(get.totalRow);
+    let dt: any = [];
+    if (get?.status == "success") {
+      if (get?.message) {
+        get.message?.map((item: any, index: number) => {
+      dt.push({
+        id: index + 1,
+        name: item.name,
+        uuid: item.id,
+        media: item.media,
+        contents: item.contents,
+        submission_date:item.submission_date,
+        assignment_date:item.assignment_date,
+        submit:item.batchStudentsAssignment
+      });
+        });
+      }
+    }
+    setloading(false);
+    settableRow(dt);
+  };
+
+  if (props.name === "studentBatchAssignment") {
+    columns = [
+      { field: "id", headerName: "ID", width: 20 },
+      { field: "name", headerName: "Name", width: 200 },
+      { field: "assignment_date", headerName: "Date ", width: 130,
+      renderCell: (params: any) => {
+        let date = moment(params.row.assignment_date,'YYYY-MM-DD').format('DD/MMM/YYYY')
+        return date 
+      } 
+      },
+      { field: "submission_date", headerName: "Submision date ", width: 130,
+      renderCell: (params: any) => {
+        let date = moment(params.row.submission_date).format('DD/MMM/YYYY')
+        return date 
+      }
+     },
+      { field: "media", headerName: "media ", width: 150,
+      renderCell: (params: any) => {
+        let html:any = [];
+        let spit:any = params.row.media.split(',');
+          if(spit.length > 0){
+          
+            spit.map(async(item:any,index:number)=>{
+              let checkURL =  isUrl(item);
+              if(checkURL){
+                const lastPartAfterLastDot =  getLastpartFromString('.',item);
+                html.push({
+                  link:item,
+                  ext:lastPartAfterLastDot
+                })
+              }
+             })
+            
+          }
+        return <>
+          <div className="flex gap-2">
+            {
+              html.length > 0 ? (
+                html.map((item:any,index:number)=>(
+                  item.ext === "exe" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-gray-500 text-white p-1 rounded-md"  >
+                    <FaStop />
+                    </a>
+                    </div>
+                  ) : 
+                  item.ext === "mp4" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaVideo />
+                    </a>
+                   </div>
+                  ) : item.ext === "mp3" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaAudible />
+                    </a>
+                    </div>
+                  ):  item.ext === "pdf" ? (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaFilePdf />
+                    </a>
+                    </div>
+                  ):  item.ext === "docx" ? (
+                    <div key={index} className="flex gap-2 "> 
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaFileWord />
+                    </a>
+                    </div>
+                  ): (
+                    <div key={index} className="flex gap-2 ">
+                    <a href={item.link} target="_blank" className="bg-blue-500 text-white p-1 rounded-md"  >
+                    <FaStar />
+                    </a>
+                    </div>
+                  )
+                                    
+                ))
+              ):null
+            }
+            </div>
+            </>
+      }
+      },
+      { field: "contents", headerName: "contents ", width: 150, 
+      renderCell: (params: any) => {
+        let trucate = truncateHTMLChar(params.row.contents,15);
+        console.log(trucate)
+        return (
+
+          <Tooltip title={ReactHtmlParser(params.row.contents)} arrow >
+            <div dangerouslySetInnerHTML={{ __html: trucate }} />
+          </Tooltip>
+        )
+      }
+      },
+      // { field: "submission", headerName: "submissions ", width: 100 ,
+      // renderCell: (params: any) => {
+      //   return `${params.row.submission}/${params.row.students}` 
+      // }
+      // },
+      {
+        field: "actions",
+        headerName: "Actions",
+        width: 300,
+        renderCell: (params: any) => {
+          return (
+            <div className="flex gap-4 flex-row">
+              {
+                params.row.submit.length > 0 ?
+                <button disabled={true}  className=" px-3 py-2 text-white bg-yellow-600 rounded-lg">
+                uploaded
+                </button>
+                 :
+                 (
+                <button  onClick={(()=>navigate(`/student/batches/assignment/upload/${params.row.uuid}`))} className=" px-3 py-2 text-white bg-blue-600 rounded-lg">
+                  upload
+              </button>
+                 )
+              }
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
+
   const [rowCountState, setRowCountState] = useState(totalRow || 0);
   useEffect(() => {
     if (props.name === "instituteStudents") {
@@ -1154,6 +1535,19 @@ export default function PaginationDataGrid(props: {
       totalRow !== undefined ? totalRow : prevRowCountState
     );
     }
+    if (props.name === "teacherBatchAssignment") {
+      teacherBatchAssignment();
+      setRowCountState((prevRowCountState) =>
+      totalRow !== undefined ? totalRow : prevRowCountState
+    );
+    }
+    if (props.name === "studentBatchAssignment") {
+      studentBatchAssignment();
+      setRowCountState((prevRowCountState) =>
+      totalRow !== undefined ? totalRow : prevRowCountState
+    );
+    }
+    
     
     
   }, [props.refresh, page, pageSize, totalRow, query]);

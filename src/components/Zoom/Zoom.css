@@ -1,2 +1,55 @@
 @import url("https://source.zoom.us/2.17.0/css/bootstrap.css");
 @import url("https://source.zoom.us/2.17.0/css/react-select.css");
+
+html, body {
+  height: 100%;
+  width: 100%;
+  min-width: 100vw !important;
+  overflow: hidden;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+  font-family: "Open Sans";
+  color: #771d1d !important;
+}
+
+#zmmtg-root, .meeting-client, .meeting-client-inner {
+    width: 100vw !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    max-width: 100vw !important;
+    min-height: 100vh !important;
+    min-width: 100vw !important;
+    overflow: hidden !important;
+  }
+  .root-inner > #content_container{
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    max-width: 100vw !important;
+    margin:  0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #wc-footer {
+    bottom: auto !important;
+    width: 100vw !important;
+  }
+  
+  #dialog-join {
+    width: 100vw !important;
+  }
+  
+  #sv-active-video, .active-main, #sv-active-speaker-view, .main-layout {
+    height: 400px !important;
+    width: 100vw !important;
+  }
+  
+  .suspension-window {
+    transform: translate(-10vw, 10px) !important;
+  }
+  
+  #dialog-invite {
+    display: none;
+  }

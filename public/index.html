@@ -35,9 +35,27 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <style>
+    html, body {
+    height: 100%;
+    width: 100%;
+    min-width: 100vw !important;
+    overflow: hidden;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    font-family: "Open Sans";
+    color: #1f1d1d !important;
+}
+      body > iframe {
+        display: none;
+      }
+      body {
+        max-width: 100vw !important;
+      }
+    </style>
   </head>
   <body>
-    <div id="meetingSDKElement"></div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 

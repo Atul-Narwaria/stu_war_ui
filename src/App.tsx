@@ -6,7 +6,6 @@ import NotFound from "./pages/web/NotFound";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Skeleton from "@mui/material/Skeleton";
-import TeacherZoom from "./components/Zoom/TeacherZoom";
 
 const Home = lazy(() => import("./pages/admin/Home"));
 const AdminIndex = lazy(() => import("./pages/admin/Index"));
@@ -50,12 +49,20 @@ const InstStundetCourseCreate = lazy(() => import("./pages/institute/course/stud
 
 const TeacherIndex = lazy(() => import("./pages/teacher/Index"));
 const TeacherHome = lazy(() => import("./pages/teacher/Home"));
-const TeacherBatchAssignmentUpload = lazy(() => import("./pages/teacher/BatchAssignmentUpload"));
+const TeacherBatchAssignmentUpload = lazy(() => import("./pages/teacher/assignment/BatchAssignmentUpload"));
 const TeacherZooom = lazy(() => import("./components/Zoom/TeacherZoom"));
-const StudentZooom = lazy(() => import("./components/Zoom/StudentZoom"));
+const TeacherBatches = lazy(() => import("./pages/teacher/Batches"));
+const TeacherBatchesAssignment = lazy(() => import("./pages/teacher/assignment/BatchAssignments"));
+const TeacherBatchesAssignmentEdit = lazy(() => import("./pages/teacher/assignment/BatchAssinmentEdit"));
 
+const StudentZooom = lazy(() => import("./components/Zoom/StudentZoom"));
+const StudentZoomComponent = lazy(() => import("./components/Zoom/StudentZoomComponent"));
 const StudentIndex = lazy(() => import("./pages/student/Index"));
 const StudentHome = lazy(() => import("./pages/student/Home"));
+const StudentBatchs = lazy(() => import("./pages/student/BatchesStudent"));
+const StudentBatchsAssignment = lazy(() => import("./pages/student/BatchAssignmentStudent")); 
+const StudentBatchsUploadAssignment = lazy(() => import("./pages/student/BatchAssignmentStudentUpload"));
+
 
 function App() {
   const isAdmin = useSelector((state: any) => state.auth.isLoggedIn);
@@ -74,7 +81,6 @@ function App() {
       setOpen(true);
     }
   }, []);
-  console.log(process.env.ZOOM_CLIENT)
   return (
     <BrowserRouter>
       {/* <Routes>
@@ -262,14 +268,29 @@ function App() {
               element={isTeacherLogin ? <TeacherHome /> : <WebHome />}
             />
             <Route
-              path="batch/assignemnt/upload/:batchid"
+              path="batches/assignemnt/upload/:batchid"
               element={isTeacherLogin ? <TeacherBatchAssignmentUpload /> : <WebHome />}
             />
-            
+             <Route
+              path="batches"
+              element={isTeacherLogin ? <TeacherBatches /> : <WebHome />}
+            />
+            <Route
+              path="batches/assignment/:id"
+              element={isTeacherLogin ? <TeacherBatchesAssignment /> : <WebHome />}
+            />
+            <Route
+              path="batches/assignment/edit/:id"
+              element={isTeacherLogin ? <TeacherBatchesAssignmentEdit /> : <WebHome />}
+            />
             </Route>
             <Route
               path="/student/zoom_class/:meeting/:password"
               element={isStudentLogin ? <StudentZooom /> : <WebHome />}
+            />
+              <Route
+              path="/student/zoom_class/component/:meeting/:password"
+              element={isStudentLogin ? <StudentZoomComponent /> : <WebHome />}
             />
             <Route
             path="/student"
@@ -280,7 +301,18 @@ function App() {
               index
               element={isStudentLogin ? <StudentHome /> : <WebHome />}
             />
-            
+            <Route
+              path="batches"
+              element={isStudentLogin ? <StudentBatchs /> : <WebHome />}
+            />
+              <Route
+              path="batches/assignment/:id"
+              element={isStudentLogin ? <StudentBatchsAssignment /> : <WebHome />}
+            />
+            <Route
+              path="batches/assignment/upload/:id"
+              element={isStudentLogin ? <StudentBatchsUploadAssignment /> : <WebHome />}
+            />
             </Route>
         </Routes>
       </Suspense>

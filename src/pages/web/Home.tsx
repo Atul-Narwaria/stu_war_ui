@@ -222,7 +222,7 @@ const getIp = async() =>{
   };
 
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 min-h-screen content-center px-10 lg:px-2   w-full    ">
+    <section className="grid bg-white grid-cols-1 lg:grid-cols-2 min-h-screen content-center px-10 lg:px-2   w-full   ">
       <div
         className=" hidden lg:block h-screen relative"
         style={{

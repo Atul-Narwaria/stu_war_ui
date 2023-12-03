@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-#{
-  
-}
+
 
 #sidebar a.active {
   background-color: rgba(164, 162, 162, 0.219);

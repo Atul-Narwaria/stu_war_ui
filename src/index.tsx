@@ -5,6 +5,11 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import store from "./store";
+const element:any = document.getElementById("zmmtg-root");
+    if (element) {
+        element.style.display = 'none';
+        element.style.background = 'white';
+    }
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
